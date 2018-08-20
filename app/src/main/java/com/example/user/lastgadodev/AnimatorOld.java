@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class Animator implements Runnable {
+public class AnimatorOld implements Runnable {
 
     public GoogleMap geoMap;
     public final Handler mHandler = new Handler();
@@ -154,11 +154,11 @@ public class Animator implements Runnable {
 
                         ///Todo: destination is reached / tracking might be cancelled, do something
                         System.out.println("finished camera");
-                        Log.e("animator before reset", Animator.this.toString() + "");
+                        Log.e("animator before reset", AnimatorOld.this.toString() + "");
                         reset();
-                        Log.e("animator after reset", Animator.this.toString() + "");
+                        Log.e("animator after reset", AnimatorOld.this.toString() + "");
                         Handler handler = new Handler();
-                        handler.post(Animator.this);
+                        handler.post(AnimatorOld.this);
                     }
 
                     @Override

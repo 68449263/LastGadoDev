@@ -22,7 +22,7 @@
         android:title="geoRide" />
 
     <item
-        android:id="@+id/schedule_trip"
+        android:id="@+id/main_manu"
         android:icon="@drawable/ic_menu"
         android:title="menu" />
 

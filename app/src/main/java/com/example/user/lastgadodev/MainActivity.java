@@ -1,10 +1,13 @@
 package com.example.user.lastgadodev;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,16 +23,17 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 
 import android.support.design.widget.BottomSheetBehavior;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity
     public Button StartTrainSearchFragmentButton;
     private Button ToggleBottomSheetState;
     public Button ButtonCancelTracking;
-    public StationsData stations_data = new StationsData();
+    public static StationsData stations_data = new StationsData();
     public static RouteLatLngData routeLatLngData = new RouteLatLngData();
 
     //internal animation testing variables and properties
@@ -132,6 +136,9 @@ public class MainActivity extends AppCompatActivity
     //floating prev nxt stations labels
     CardView prevNxtStation;
 
+    //username floating label
+    CardView userNameFloatingLabel;
+
     //---- Floating action button, shows map properties dialog when clicked
     FloatingActionButton ShowMapPropertiesFAB;
 
@@ -161,11 +168,13 @@ public class MainActivity extends AppCompatActivity
     public FragMarkerInfo MarkerInfo;
     public GeoTrain clickedTrain;
 
-    private TextView previousStationValue;
-    private TextView nextStationValue;
-    private TextView BottomSheetDepartureValue;
-    private TextView BottomSheetDestinationValue;
-    private TextView BottomSheetTrainIdValue;
+    public static TextView previousStationValue;
+    public static TextView nextStationValue;
+    public TextView BottomSheetDepartureValue;
+    public TextView BottomSheetDestinationValue;
+    public TextView BottomSheetTrainIdValue;
+
+    public BottomNavigationView navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,11 +236,13 @@ public class MainActivity extends AppCompatActivity
     private void AdditionalSetup() {
 
         //Bottom navigation
-        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.map);
 
         prevNxtStation = findViewById(R.id.previousNxtStopID);
+        userNameFloatingLabel = findViewById(R.id.username_card_label);
+        userNameFloatingLabel.setVisibility(View.VISIBLE);
 
         //plus - minus image button for expanding and collapsing bottom sheet
         ToggleBottomSheetState = findViewById(R.id.toggleBottomSheetState);
@@ -259,10 +270,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 stop();
-                StartTrainSearchFragmentButton.setVisibility(View.VISIBLE);
-                sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                latlngPoints.clear();
-                currentIndex = 0;  //Todo: if animating a moving train already, set the current index to its current latlng
 
             }
         });
@@ -331,15 +338,104 @@ public class MainActivity extends AppCompatActivity
 
                     return false;
 
-                case R.id.schedule_trip:
-
-
+                case R.id.main_manu:
+                    showMenuDialog();
                     return false;
             }
 
             return false;
         }
     };
+
+    private void showMenuDialog() {
+
+        final View dialogView = View.inflate(this,R.layout.menu_dialog,null);
+
+        final Dialog dialog = new Dialog(this,R.style.MyAlertDialogStyle);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(dialogView);
+
+        ImageView imageView = dialog.findViewById(R.id.closeMenuDialog);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                animateDialogOnShow(dialogView, false, dialog);
+            }
+        });
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                animateDialogOnShow(dialogView, true, null);
+            }
+        });
+
+        dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+
+                if (i == KeyEvent.KEYCODE_BACK){
+
+                    animateDialogOnShow(dialogView, false, dialog);
+                    return true;
+                }
+                return false;
+            }
+
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        dialog.show();
+    }
+
+    private void animateDialogOnShow(View dialogView, boolean b, final Dialog dialog) {
+
+        final View view = dialogView.findViewById(R.id.dialog);
+
+        int w = view.getWidth();
+        int h = view.getHeight();
+
+        int endRadius = (int) Math.hypot(h, w);
+
+        int cx = (int) (navigation.findViewById(R.id.main_manu).getX() + (userNameFloatingLabel.getWidth()/2));
+        int cy = (int) (navigation.findViewById(R.id.main_manu).getY())+ (userNameFloatingLabel.getHeight() + 56);
+
+
+        if(b){
+            android.animation.Animator revealAnimator = ViewAnimationUtils.createCircularReveal(view, cx,cy, 0, endRadius);
+
+            revealAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    view.setVisibility(View.VISIBLE);
+                }
+            });
+
+            revealAnimator.setDuration(1500);
+            revealAnimator.start();
+
+        } else {
+
+            android.animation.Animator anim =
+                    ViewAnimationUtils.createCircularReveal(view, cx, cy, endRadius, 0);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    dialog.dismiss();
+                    view.setVisibility(View.INVISIBLE);
+
+                }
+            });
+            anim.setDuration(700);
+            anim.start();
+        }
+
+    }
 
 
     public void showBottomSheetDialog() {
@@ -405,9 +501,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(getApplication(), "Changing map style", Toast.LENGTH_SHORT).show();
                 ShowMapPropertiesDialog();
-                toggleStyle();
+                //toggleStyle(); Todo toggle style from the pop up
             }
         });
 
@@ -433,11 +528,14 @@ public class MainActivity extends AppCompatActivity
                     case BottomSheetBehavior.STATE_HIDDEN: {
 
                         prevNxtStation.setVisibility(View.GONE);
+                        userNameFloatingLabel.setVisibility(View.VISIBLE);
                         //this condition ensures the visibility of bottom sheet when the marker is animating
                         if (TrackingMarkerIsAnimating) {
 
                             toggleBottomSheet();
+                            userNameFloatingLabel.setVisibility(View.GONE);
                             prevNxtStation.setVisibility(View.VISIBLE);
+
                         }
                     }
                     break;
@@ -451,6 +549,7 @@ public class MainActivity extends AppCompatActivity
                         ToggleBottomSheetState.setBackgroundResource(R.drawable.ic_plus);
                         if (TrackingMarkerIsAnimating) {
 
+                            userNameFloatingLabel.setVisibility(View.GONE);
                             prevNxtStation.setVisibility(View.VISIBLE);
                         }
                     }
@@ -475,6 +574,18 @@ public class MainActivity extends AppCompatActivity
 
         //TODO: handle back press events
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stop();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        //Todo: if TrackingMarker was animating continue where it left off
     }
 
     // calls bottom sheet, only when the tracking marker is in motion, to show more info about the marker
@@ -567,11 +678,11 @@ public class MainActivity extends AppCompatActivity
 
     public void onLocationChangeUpdater(DataSnapshot snapshot) {
         //Only manipulate the map, when it is ready else it will throw an exception
-        if (mapReady == true) {
+        if (mapReady) {
 
             if (snapshot != null) {
 
-                if (activityStart == true) {
+                if (activityStart) {
 
                     for (DataSnapshot Trainsnapshot : snapshot.getChildren()) {
 
@@ -759,44 +870,9 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public String ResolveRoute(String departure, String destination) {
+    public void preparePathForRoute(String route){
 
-        //TODO: make a separate class for populating path LatLng coordinates
-
-        //we check if the main route contains the departure and destination, if true then sub-routes contains them
-        //TODO: work this out effectively in terms of applicability and not routes, e.g if sub routes are not applicable don't show their trains
-        if (stations_data.Leralla_to_Johannesburg.containsKey(departure) && stations_data.Leralla_to_Johannesburg.containsKey(destination)) {
-
-            System.out.println("--------------Leralla to JHB route is applicable-----------------------");
-            //testing
-            LoadLatLngToArrayList("Leralla_to_Johannesburg");
-            //--
-            //TODO: set Database reference to this route and select all the sub-routes for list results
-
-            possibleRoute = "Leralla_to_Johannesburg";
-
-        } else {
-
-            System.out.println("--------this trip is not possible within Leralla2JHB route-------");
-        }
-
-        if (stations_data.Pretoria_to_Johannesburg.containsKey(departure) && stations_data.Pretoria_to_Johannesburg.containsKey(destination)) {
-
-            System.out.println("--------------Pretoria to JHB route is applicable-----------------------");
-            //testing
-            LoadLatLngToArrayList("Pretoria_to_Johannesburg");
-            //--
-            //TODO: set Database reference to this route and select all the sub-routes for list results
-
-            possibleRoute = "Pretoria_to_Johannesburg";
-
-        } else {
-
-            System.out.println("---------this trip is not possible within Pretoria2JHB route-----");
-
-        }
-
-        return possibleRoute;
+        LoadLatLngToArrayList(route);
     }
 
     // executed when the history list item is clicked, for debugging it also executes when marker is clicked on map
@@ -1029,8 +1105,16 @@ public class MainActivity extends AppCompatActivity
 
     //-------------------------------- very important make use of it ------------------------------------
     public void stop() {
+
         mHandler.removeCallbacks(this);
         TrackingMarkerIsAnimating = false;
+
+        //TODO: review this functionality efficiency
+        StartTrainSearchFragmentButton.setVisibility(View.VISIBLE);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        latlngPoints.clear();
+        currentIndex = 0;  //Todo: if animating a moving train already, set the current index to its current latlng
+
     }
 
     public void reset() {

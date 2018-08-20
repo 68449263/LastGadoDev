@@ -5,9 +5,13 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import java.util.HashMap;
 
+import static com.example.user.lastgadodev.MainActivity.clearCachedData;
+
 //NOTE: all routes lead to/move towards Johannesburg within this DATA Class!
 
 public class StationsData {
+
+    public String possibleRoute;
 
     LatLng Pretoria = new LatLng(-25.75954, 28.18902);
     LatLng Fonteine = new LatLng(-25.78395,   28.1932);
@@ -235,4 +239,66 @@ public class StationsData {
         Pretoria_to_Johannesburg.clear();
 
     }
+
+    public String ResolveRoute(String departure, String destination) {
+
+         LoadStationsToRoutes();
+        //TODO: make a separate class for populating path LatLng coordinates
+
+        //we check if the main route contains the departure and destination, if true then sub-routes contains them
+        //TODO: work this out effectively in terms of applicability and not routes, e.g if sub routes are not applicable don't show their trains
+        if (Leralla_to_Johannesburg.containsKey(departure) && Leralla_to_Johannesburg.containsKey(destination)) {
+
+            System.out.println("--------------Leralla to JHB route is applicable-----------------------");
+
+            //TODO: set Database reference to this route and select all the sub-routes for list results
+            possibleRoute = "Leralla_to_Johannesburg";
+            setPossibleRoute(possibleRoute);
+            clearCachedPath();
+
+        } else {
+
+            System.out.println("--------this trip is not possible within Leralla2JHB route-------");
+        }
+
+        if (Pretoria_to_Johannesburg.containsKey(departure) && Pretoria_to_Johannesburg.containsKey(destination)) {
+
+            System.out.println("--------------Pretoria to JHB route is applicable-----------------------");
+
+            //TODO: set Database reference to this route and select all the sub-routes for list results
+            possibleRoute = "Pretoria_to_Johannesburg";
+            setPossibleRoute(possibleRoute);
+            clearCachedPath();
+
+        } else {
+
+            System.out.println("---------this trip is not possible within Pretoria2JHB route-----");
+
+        }
+
+
+
+        return getPossibleRoute();
+    }
+
+    public void setPossibleRoute(String possibleRoute) {
+        this.possibleRoute = possibleRoute;
+    }
+
+    public String getPossibleRoute() {
+        return possibleRoute;
+    }
+
+    private void clearCachedPath() {
+
+        Leralla_to_Johannesburg.clear();
+        Leralla_to_Elandsfontein.clear();
+        Leralla_to_Germiston.clear();
+
+        Pretoria_to_Johannesburg.clear();
+        Pretoria_to_Germiston.clear();
+        Pretoria_to_Elandsfontein.clear();
+
+    }
+
 }

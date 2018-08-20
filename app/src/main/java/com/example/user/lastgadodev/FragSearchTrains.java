@@ -21,6 +21,7 @@ import com.example.user.lastgadodev.Models.GeoTrain;
 import com.example.user.lastgadodev.adapters.AutoCompleteTextInputAdapter;
 import com.example.user.lastgadodev.adapters.SearchHistoryListAdapter;
 import com.example.user.lastgadodev.adapters.SearchResultsListAdapter;
+import com.example.user.lastgadodev.data.StationsData;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,6 +51,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
     public List<String> Leralla_to_JHB_Subroutes = new ArrayList<>();
     public List<String> Pretoria_to_JHB_Subroutes = new ArrayList<>();
 
+    public StationsData stationsData = new StationsData();
 
     public FragSearchTrains() {
         // Required empty public constructor
@@ -78,7 +80,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         searchHistoryListAdapter = new SearchHistoryListAdapter();
         searchHistoryListAdapter.setItemsOnClickListener(this);
         GeoSearchHistory.setAdapter(searchHistoryListAdapter);
-        GeoSearchHistory.setHasFixedSize(false);
+        GeoSearchHistory.setHasFixedSize(true);
         GeoSearchHistory.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
         setupSearchHistory();
@@ -177,7 +179,8 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         String departure = DepartureACTV.getText().toString();
         String destination = DestinationACTV.getText().toString();
 
-        possible_route = ((MainActivity) getActivity()).ResolveRoute(departure, destination);
+        possible_route = stationsData.ResolveRoute(departure, destination);
+        ((MainActivity) getActivity()).preparePathForRoute(possible_route);
 
         //Queries Firebase Database
         getAvailableTrains(possible_route);
