@@ -1,0 +1,82 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:windowBackground">@drawable/geosplashscreen</item>
+
+    </style>
+
+    <style name="NetAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
+    <style name="ButtonBackground">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:buttonStyle">@android:style/Widget.Material.Button.Borderless</item>
+        <item name="android:layout_gravity">bottom|center</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:layout_margin">15dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ems">10</item>
+    </style>
+
+<!--    &lt;!&ndash;Floating search view styles&ndash;&gt;
+    <style name="FloatingSearchView">
+        <item name="floatingSearch_backgroundColor"></item>
+        <item name="floatingSearch_viewSearchInputTextColor"></item>
+        <item name="floatingSearch_viewSuggestionItemTextColor"></item>
+        <item name="floatingSearch_hintTextColor"></item>
+        <item name="floatingSearch_dividerColor"></item>
+        <item name="floatingSearch_clearBtnColor"></item>
+        <item name="floatingSearch_leftActionColor"></item>
+        <item name="floatingSearch_menuItemIconColor"></item>
+        <item name="floatingSearch_suggestionRightIconColor"></item>
+        <item name="floatingSearch_actionMenuOverflowColor"></item>
+    </style>-->
+
+
+    <style name="ListButtonBackground">
+        <item name="android:background">@drawable/button_background2</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:ems">2</item>
+    </style>
+
+    <!-- Search Text fields styles-->
+    <style name="searchtextinput">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">35dp</item>
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:ems">10</item>
+        <item name="android:inputType">textAutoComplete</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#fff</item>
+        <item name="android:textColorHint">#fff</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/textinputbackground</item>
+    </style>
+
+    <!--Switch button style-->
+    <style name="MySwitchButtonStyle" parent="@style/Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:thumbTint">#f9f9f9</item>
+    </style>
+
+    <!--Edit text Theme-->
+    <style name="EditTextTheme">
+        <item name="colorPrimary">@color/whiteColor</item>
+        <item name="colorPrimaryDark">@color/whiteColor</item>
+        <item name="colorAccent">@color/whiteColor</item>
+    </style>
+
+
+</resources>

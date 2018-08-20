@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Geometrorail</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--Floating search view-->
+    <string name="action_voice_rec">action voice rec</string>
+    <string name="action_location">action location</string>
+    <string name="action_taxi">action taxi</string>
+    <string name="action_change_colors">change style</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="action_example_with_sliding_list">Sliding list</string>
+    <string name="action_example_sliding_search_bar">Sliding search view</string>
+    <string name="action_example_scrolling_search_bar">scrolling behavior</string>
+
+    <!--Navigation drawer-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <!--Bottom Navigation-->
+    <string name="title_shop">Home</string>
+    <string name="title_gifts">Free Ticket</string>
+    <string name="title_cart">Trip</string>
+    <string name="title_profile">Profile</string>
+
+</resources>

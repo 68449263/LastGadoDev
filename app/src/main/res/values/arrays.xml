@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="StationNames">
+
+        <item>Pretoria</item> <!-- From here till the end = Pretoria_to_Johannesburg-->
+        <item>Fonteine</item>
+        <item>Kloofsig</item>
+        <item>Sportpark</item>
+        <item>Centurion</item>
+        <item>Irene</item>
+        <item>Pinedene</item>
+        <item>Olifantsfontein</item>
+        <item>Oakmoor</item>
+        <item>Leralla</item> <!-- From here till the end = Leralla_to_Johannesburg-->
+        <item>Limindlela</item>
+        <item>Tembisa</item>
+        <item>Kaalfontein</item>
+        <item>Birchleigh</item>
+        <item>VanRiebeeckPark</item>
+        <item>KemptonPark</item>
+        <item>Rhodesfield</item>
+        <item>Isando</item>
+        <item>Elandsfontein</item>
+        <item>Ravensklip</item>
+        <item>Knights</item>
+        <item>Germiston</item>
+        <item>President</item>
+        <item>Driehoek</item>
+        <item>Geldenhuis</item>
+        <item>Cleveland</item>
+        <item>Tooronga</item>
+        <item>Denver</item>
+        <item>GeorgeGoch</item>
+        <item>Jeppe</item>
+        <item>Ellispark</item>
+        <item>Doorfotein</item>
+        <item>Johannesburg</item>
+
+    </string-array>
+
+    <string-array name="sf_zips">
+        <item>94102</item>
+        <item>94103</item>
+        <item>94104</item>
+        <item>94105</item>
+        <item>94107</item>
+        <item>94108</item>
+        <item>94109</item>
+        <item>94110</item>
+        <item>94111</item>
+        <item>94112</item>
+        <item>94114</item>
+        <item>94115</item>
+        <item>94116</item>
+        <item>94117</item>
+        <item>94118</item>
+        <item>94121</item>
+        <item>94122</item>
+        <item>94123</item>
+        <item>94124</item>
+        <item>94127</item>
+        <item>94129</item>
+        <item>94130</item>
+        <item>94131</item>
+        <item>94132</item>
+        <item>94133</item>
+        <item>94134</item>
+        <item>94158</item>
+    </string-array>
+</resources>

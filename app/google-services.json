@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "687893037339",
+    "firebase_url": "https://lastgadodev.firebaseio.com",
+    "project_id": "lastgadodev",
+    "storage_bucket": "lastgadodev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687893037339:android:26ebdf0c9bb33e26",
+        "android_client_info": {
+          "package_name": "com.example.user.lastgadodev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687893037339-n41a3dcma8jdt1sgmua56e985b7m0fvo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.lastgadodev",
+            "certificate_hash": "b3afba5fe63ceeb7f96e3f2c75a62b9c05dbf7d1"
+          }
+        },
+        {
+          "client_id": "687893037339-l0ce97f23htgt6up8169vikkq3iu0dov.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCfF2coNsrRoMmXVNASS8FHjOo7Ri4J7c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687893037339-l0ce97f23htgt6up8169vikkq3iu0dov.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#f9f9f9"
+    android:orientation="vertical"
+    android:padding="5dp"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="90dp"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="1dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#f5f5ef"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="26dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_yellow_train"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="3"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/BottomSheetdepatureTV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="15dp"
+                            android:textColor="#08241E"
+                            android:textStyle="bold"
+                            android:textSize="13dp"
+                            android:text="Departure"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="15dp"
+                            android:textColor="#08241E"
+                            android:textStyle="bold"
+                            android:textSize="13dp"
+                            android:text="to"/>
+
+                        <TextView
+                            android:id="@+id/BottomSheetdestinationTV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="15dp"
+                            android:textColor="#08241E"
+                            android:textStyle="bold"
+                            android:textSize="13dp"
+                            android:text="Destination "/>
+
+                    </LinearLayout>
+
+
+                    <TextView
+                        android:id="@+id/bottomSheetTrainId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:layout_marginStart="45dp"
+                        android:gravity="center"
+                        android:text="0054"
+                        android:textColor="#08241E"
+                        android:textSize="23dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:layout_marginStart="46dp"
+                android:layout_marginEnd="12.5dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="5dp"
+                android:background="#f9f9f9"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_vintage_clock"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:textColor="#08241E"
+                    android:textSize="13dp"
+                    android:text="20 minutes delayed "/>
+
+                <Button
+                    android:id="@+id/toggleBottomSheetState"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:background="@drawable/ic_plus"
+                    android:textColor="#ffbb00"
+                    android:textAllCaps="false"
+                    android:elevation="0dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        android:weightSum="2.02">
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#f5f5ef"
+            android:layout_weight="1"
+            android:id="@+id/cancelTracking"
+            android:text="Cancel"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:textColor="#08241E" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_weight="0.02"
+            android:layout_height="match_parent"
+            android:background="#f9f9f9"/>
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#f5f5ef"
+            android:layout_weight="1"
+            android:text="View Nearby"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:textColor="#08241E"/>
+
+    </LinearLayout>
+
+    <!--
+                android:background="@drawable/button_background"
+            style="?android:attr/borderlessButtonStyle"
+    -->
+
+</LinearLayout>

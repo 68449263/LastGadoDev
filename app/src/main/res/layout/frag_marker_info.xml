@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/button_background2"
+    android:orientation="vertical"
+    tools:context=".FragMarkerInfo">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/button_background2"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:padding="5dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_weight="0.2"
+            android:gravity="start"
+            android:src="@drawable/ic_white_flat_map_marker" />
+
+        <TextView
+            android:id="@+id/nxtStation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="start"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:text="next station"
+            android:textColor="#f9f9f9"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/nextStationValueTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1.8"
+            android:gravity="end"
+            android:layout_marginEnd="15dp"
+            android:text="next station value"
+            android:textColor="#f9f9f9"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffbb00"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/departuretodestination"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/depardestination" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/depatureTV"
+                                style="@style/searchtextinput"
+                                android:layout_weight="2"
+                                android:gravity="center_vertical"
+                                android:textSize="15sp"
+                                android:text="Departure"
+                                android:theme="@style/EditTextTheme" />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="To"
+                            android:textColor="#fff" />
+
+
+
+                            <TextView
+                                android:id="@+id/destinationTV"
+                                style="@style/searchtextinput"
+                                android:layout_weight="2"
+                                android:gravity="center_vertical"
+                                android:textSize="15sp"
+                                android:hint="Destination"
+                                android:theme="@style/EditTextTheme"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal"
+                        android:paddingTop="2dp"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:src="@drawable/ic_white_train" />
+
+                        <TextView
+                            android:id="@+id/trainID_TV"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|center"
+                            android:layout_marginStart="15dp"
+                            android:text="Train id"
+                            android:textColor="#f9f9f9"
+                            android:textSize="30sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/lightbackgroundshape"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="34dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/ic_yellow_thick_speed_clock" />
+
+                    <TextView
+                        android:id="@+id/speedTV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text="speed"
+                        android:textSize="10sp"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/B_travel_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/gradientbackground"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Express"
+                    android:textAllCaps="false"
+                    android:textColor="#f9f9f9"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/ic_yellow_thick_clock" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:textSize="10sp"
+                        android:text="20 min late"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="5dp"
+            android:background="#73ffffff"/>
+
+        <Button
+            android:id="@+id/TrackSelectedMarkerId"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_margin="7dp"
+            android:text="View Train"
+            android:textAllCaps="false"
+            android:textColor="#f9f9f9"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
