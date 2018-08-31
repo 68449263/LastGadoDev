@@ -1,102 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="350dp"
+    android:layout_width="250dp"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:background="@drawable/lightbackgroundshape"
-    android:orientation="vertical"
-    android:padding="5dp">
-
-    <TextView
-        android:id="@+id/txtclose"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="end"
-        android:background="@drawable/ic_close"
-        android:gravity="center"
-        android:text=""
-        android:textColor="#fff"
-        android:textStyle="bold" />
+    android:layout_gravity="center"
+    android:background="#FFF9F9F9"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="@drawable/button_background2"
+        android:padding="10dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="Map Settings"
+            android:textColor="#f9f9f9"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <ImageView
-            android:layout_width="36dp"
-            android:layout_height="46dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp"
-            android:src="@drawable/geometroappicon" />
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="10dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_geonotification" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:text="Map Properties"
-            android:textSize="20dp"
-            android:textColor="#1c2224"
-            android:textStyle="bold" />
+    </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
-            android:text="Map Properties"
-            android:textColor="#1c2224" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:padding="10dp"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="50"
+                android:background="@drawable/nomarl_map"
+                android:textColor="#08241E"
+                android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:text="Exp : "
-                android:textColor="#1c2224" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:text="12-December-2018"
-                android:textColor="#1c2224" />
+                android:padding="5dp"
+                android:text="Default"
+                android:textColor="#ffbb00"
+                android:textSize="15sp" />
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="50"
+                android:background="@drawable/satelite_map"
+                android:textColor="#08241E"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Satellite"
+                android:textColor="#ffbb00"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="50"
+                android:background="@drawable/terrain_map"
+                android:textColor="#ffbb00"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Terrain"
+                android:textColor="#ffbb00"
+                android:textSize="15sp" />
+
+        </LinearLayout>
     </LinearLayout>
+
+<!--    <View
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:background="@color/lightgray" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/button_background2"
         android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+        <TextView
+            android:id="@+id/txtclose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_oval_shape"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_qr_code" />
+            android:text="Close"
+            android:textColor="#ffbb00"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnfollow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
-        android:background="@color/colorPrimary"
-        android:text="Verify"
-        android:textColor="#fff" />
 
 </LinearLayout>

@@ -59,7 +59,7 @@ public class SearchResultsListAdapter extends RecyclerView.Adapter<SearchResults
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.search_results_list_item, parent, false);
+                .inflate(R.layout.search_results_list_item2, parent, false);
         return new ViewHolder(view);
     }
 
@@ -70,7 +70,7 @@ public class SearchResultsListAdapter extends RecyclerView.Adapter<SearchResults
         holder.mTrain_id_tv.setText(availableTrain.getTrain_id());
         holder.mSpeed_tv.setText(Double.toString(availableTrain.getCurrent_Speed())+" km/h");
         holder.Travel_State_tv.setText(availableTrain.getTravel_State());
-        holder.Route_Info_tv.setText(availableTrain.getRoute_Info());
+        holder.Route_Info_tv.setText("To "+availableTrain.getDestination());
 
         holder.Btracking.setOnClickListener(new View.OnClickListener() {
             @Override

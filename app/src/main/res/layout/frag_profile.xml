@@ -4,44 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f9f9f9"
+    android:background="#fcfcfc"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="10dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="405dp">
+            android:layout_height="350dp"
+            android:background="@drawable/gradientbackground"
+            android:orientation="vertical"
+            android:padding="5dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="350dp"
-                android:padding="5dp"
-                android:background="@drawable/gradientbackground"
-                android:orientation="vertical">
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="45dp"
+                android:src="@drawable/ic_profile" />
 
-                <ImageButton
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/ic_white_edit" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:padding="10dp"
+                android:text="geometrorail@gmail.com"
+                android:textColor="#fff"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="45dp"
-                    android:src="@drawable/ic_profile" />
+        </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:text="geometrorail@gmail.com"
-                    android:textColor="#fff"
-                    android:textSize="21sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="255dp"
+            android:orientation="vertical">
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
@@ -49,7 +51,6 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="285dp"
                 app:cardCornerRadius="5dp">
 
                 <LinearLayout
@@ -66,14 +67,15 @@
                         android:orientation="vertical">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="26dp"
-                            android:src="@drawable/ic_home" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/yellow_oval_shape"
+                            android:src="@drawable/ic_white_edit" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Home Station"
+                            android:text="Edit profile"
                             android:textColor="@color/colorPrimary"
                             android:textSize="12sp" />
 
@@ -127,100 +129,122 @@
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
-        </RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="360dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="25dp"
-            android:orientation="vertical">
-
-            <LinearLayout
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="25dp">
+                android:layout_centerHorizontal="true"
+                android:layout_margin="10dp"
+                app:cardCornerRadius="5dp">
 
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_envelope" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="#ffffff"
+                    android:orientation="vertical"
+                    android:paddingStart="29dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingLeft="20dp"
-                    android:text="geometro@gmail.com"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal"
+                        android:paddingLeft="25dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="horizontal"
-                android:paddingLeft="25dp">
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/ic_envelope" />
 
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_telephone" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="20dp"
+                            android:text="geometro@gmail.com"
+                            android:textColor="#08241E"
+                            android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    </LinearLayout>
 
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingLeft="20dp"
-                    android:text="+266 225 225"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:orientation="horizontal"
+                        android:paddingLeft="25dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="horizontal"
-                android:paddingLeft="25dp">
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/ic_telephone" />
 
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_home" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="20dp"
+                            android:text="+266 225 225"
+                            android:textColor="#08241E"
+                            android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    </LinearLayout>
 
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingLeft="20dp"
-                    android:text="Add home station"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:orientation="horizontal"
+                        android:paddingLeft="25dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="horizontal"
-                android:paddingLeft="25dp">
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/ic_home" />
 
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_work_industry" />
+                        <TextView
+                            android:layout_width="wrap_content"
 
-                <TextView
-                    android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="20dp"
+                            android:text="Add home station"
+                            android:textColor="#08241E"
+                            android:textStyle="bold" />
 
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingLeft="20dp"
-                    android:text="Add work station"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="25dp"
+                        android:orientation="horizontal"
+                        android:paddingLeft="25dp">
+
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/ic_work_industry" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="20dp"
+                            android:text="Add work station"
+                            android:textColor="#08241E"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
         </LinearLayout>
+
+
+    </RelativeLayout>
 
 </LinearLayout>

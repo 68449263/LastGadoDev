@@ -20,7 +20,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
+import android.support.v7.widget.CardView;;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -85,7 +85,6 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, Runnable {
 
-    //TODO : LOAD OTHER VIEWS ON SLASH SCREEN TO FREE WORK HANDLED BY MAIN ACTIVITY, E.g. GET THE USERS LOCATION FROM THERE, CHECK FOR CONNECTIONS, PERMISSIONS ETC.
     public GoogleMap geoMap;
     public Button StartTrainSearchFragmentButton;
     private Button ToggleBottomSheetState;
@@ -161,12 +160,15 @@ public class MainActivity extends AppCompatActivity
 
     //possible route
     public String possibleRoute;
+    //holds the current route of the tracking marker before it changes to its next scheduled route
+    public String previousRouteForTrackingMarker;
 
     //next station
     public int StationTracker = 1;
 
     public FragMarkerInfo MarkerInfo;
-    public GeoTrain clickedTrain;
+    public GeoTrain clickedGeoTrain;
+    public Marker clickedMarker;
 
     public static TextView previousStationValue;
     public static TextView nextStationValue;
@@ -196,16 +198,11 @@ public class MainActivity extends AppCompatActivity
 
         //firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference("Routes/Leralla_to_Germiston/Train_IDs/");
+        DatabaseReference reference = database.getReference("Routes/Leralla_to_Johannesburg/Train_IDs/");
 
-        /*Todo:Geofire  ????? review the effect of this reference,
-          try to set reference to tracking/selected marker.
-          don't forget to remove it on database after completion
-        */
         geoFire = new GeoFire(reference);
 
         ArrayList<GeoTrain> geoTrainsList = new ArrayList<>();
-        geoTrainsList.clear();
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -309,6 +306,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
     //Bottom navigation
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -322,7 +320,7 @@ public class MainActivity extends AppCompatActivity
 
                 case R.id.updates:
 
-                    showBottomSheetDialog();
+                    showTrainUpdatesDialog();
 
                     return false;
 
@@ -347,97 +345,6 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    private void showMenuDialog() {
-
-        final View dialogView = View.inflate(this,R.layout.menu_dialog,null);
-
-        final Dialog dialog = new Dialog(this,R.style.MyAlertDialogStyle);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(dialogView);
-
-        ImageView imageView = dialog.findViewById(R.id.closeMenuDialog);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                animateDialogOnShow(dialogView, false, dialog);
-            }
-        });
-
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                animateDialogOnShow(dialogView, true, null);
-            }
-        });
-
-        dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
-
-                if (i == KeyEvent.KEYCODE_BACK){
-
-                    animateDialogOnShow(dialogView, false, dialog);
-                    return true;
-                }
-                return false;
-            }
-
-        });
-
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-        dialog.show();
-    }
-
-    private void animateDialogOnShow(View dialogView, boolean b, final Dialog dialog) {
-
-        final View view = dialogView.findViewById(R.id.dialog);
-
-        int w = view.getWidth();
-        int h = view.getHeight();
-
-        int endRadius = (int) Math.hypot(h, w);
-
-        int cx = (int) (navigation.findViewById(R.id.main_manu).getX() + (userNameFloatingLabel.getWidth()/2));
-        int cy = (int) (navigation.findViewById(R.id.main_manu).getY())+ (userNameFloatingLabel.getHeight() + 56);
-
-
-        if(b){
-            android.animation.Animator revealAnimator = ViewAnimationUtils.createCircularReveal(view, cx,cy, 0, endRadius);
-
-            revealAnimator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    view.setVisibility(View.VISIBLE);
-                }
-            });
-
-            revealAnimator.setDuration(1500);
-            revealAnimator.start();
-
-        } else {
-
-            android.animation.Animator anim =
-                    ViewAnimationUtils.createCircularReveal(view, cx, cy, endRadius, 0);
-
-            anim.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    dialog.dismiss();
-                    view.setVisibility(View.INVISIBLE);
-
-                }
-            });
-            anim.setDuration(700);
-            anim.start();
-        }
-
-    }
-
-
     public void showBottomSheetDialog() {
 
         View view = getLayoutInflater().inflate(R.layout.frag_search_trains, null);
@@ -448,8 +355,8 @@ public class MainActivity extends AppCompatActivity
 
     public void showBottomSheetProfile() {
 
-        View view = getLayoutInflater().inflate(R.layout.frag_profile, null);
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        final View view = getLayoutInflater().inflate(R.layout.new_profile, null);
+        final BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(view);
         dialog.show();
     }
@@ -473,7 +380,7 @@ public class MainActivity extends AppCompatActivity
         geoRideDialog.show();
     }
 
-    public void ShowMapPropertiesDialog(){
+    public void ShowMapPropertiesDialog() {
 
         Window window = geoMapProperties.getWindow();
         window.setGravity(Gravity.CENTER);
@@ -579,7 +486,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        stop();
+        //stop();Todo: handle on resume flag
     }
 
     @Override
@@ -615,6 +522,38 @@ public class MainActivity extends AppCompatActivity
         googleMap.setMinZoomPreference(9.9f);
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
         googleMap.setOnMapClickListener(this);
+
+        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            // Use default InfoWindow frame
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                View v = null;
+                return v;
+            }
+
+            // Defines the contents of the InfoWindow
+            @Override
+            public View getInfoContents(Marker marker) {
+                View v = null;
+                try {
+
+                    // Getting view from the layout file info_window_layout
+                    v = getLayoutInflater().inflate(R.layout.marker_info_window, null);
+
+                    TextView depatureTime = v.findViewById(R.id.DepartureTime);
+                    depatureTime.setText("Departs at " + clickedGeoTrain.getDeparture_Time());
+
+                    TextView trainIdTv =  v.findViewById(R.id.ArrivalTime);
+                    trainIdTv.setText("Arrives at " + clickedGeoTrain.getArrival_Time());
+
+                } catch (Exception ev) {
+                    System.out.print(ev.getMessage());
+                }
+
+                return v;
+            }
+        });
 
     }
 
@@ -712,42 +651,32 @@ public class MainActivity extends AppCompatActivity
 
                 } else {
                     //Since markers are already added, we just update their location and info
+                    ArrayList<GeoTrain> NewGeoTrainsList = new ArrayList<>();
                     for (DataSnapshot TrainSnapshot : snapshot.getChildren()) {
 
                         final GeoTrain geoTrain = TrainSnapshot.getValue(GeoTrain.class);
                         System.out.println("--------------------Updated GeoTrains---------------------");
                         System.out.println(geoTrain);
-                        final LatLng latLng = new LatLng(geoTrain.getCurrent_latitude(), geoTrain.getCurrent_longitude());
 
+                        NewGeoTrainsList.add(geoTrain);
 
                         //update the hash map data
                         if (TrainMakers.containsKey(geoTrain.getTrain_id())) {
 
-                            System.out.println("--------------------Key was Found-----------");
-
-                            // FOR DEBBUGING PURPOSES can be removed
-                            //current position of a marker before it is updated
-                            Marker currentMaker = TrainMakers.get(geoTrain.getTrain_id());
-                            //current LatLng for marker (CPFMaker)
-                            LatLng CPFMaker = new LatLng(currentMaker.getPosition().latitude, currentMaker.getPosition().longitude);
-                            System.out.println("-------Current Position---------");
-                            System.out.println(CPFMaker.latitude);
-                            //---
+                            System.out.println("--------------The marker exists----------------");
 
                             final Marker newTrain = TrainMakers.get(geoTrain.getTrain_id());
-                            newTrain.setPosition(new LatLng(geoTrain.getCurrent_latitude(), geoTrain.getCurrent_longitude()));
-                            geoQuery = geoFire.queryAtLocation(new GeoLocation(latLng.latitude, latLng.longitude), 0.5f);
-                            geoQueryListener(geoQuery);
+                           // newTrain.setPosition(new LatLng(geoTrain.getCurrent_latitude(), geoTrain.getCurrent_longitude()));
+                           // geoQuery = geoFire.queryAtLocation(new GeoLocation(latLng.latitude, latLng.longitude), 0.5f);
+                          //  geoQueryListener(geoQuery);
+
 
                         } else {
-
                             //Todo : write a function to update the hash map with the newly added train
-                            //A new Train was added on the Database, therefore we should update our hash map
-                            System.out.println("--------------------New Train was added to hash map-----------");
-                            //add the trains in to the markers hashmap.
-                            //TrainMakers.put(geoTrain.getTrain_id(), );
                         }
                     }
+                    //updates the existing data with new trains data, useful on getting current route.
+                    geoTrainsList = NewGeoTrainsList;
                 }
 
 
@@ -830,36 +759,47 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker) {
 
+        clickedMarker = marker;
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(marker.getPosition())
+                .zoom(geoMap.getCameraPosition().zoom >= 9.9f ? geoMap.getCameraPosition().zoom : 9.9f)
+                .build();
+
+        geoMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
         for (int x = 0; x < TrainMakers.keySet().size(); x++) {
 
             if (marker.equals(TrainMakers.get(TrainIDs.get(x)))) {
-                System.out.println("---------clicked Train marker--------");
-                System.out.println(TrainMakers.get(TrainIDs.get(x)));
 
-                clickedTrain = geoTrainsList.get(x);
+                marker.showInfoWindow();
+
+                clickedGeoTrain = geoTrainsList.get(x);
 
                 //update the clicked maker index
                 //Todo : if tracking marker is animating don't update the bottom sheet values to a non animating marker that is clicked.
                 selectedMarkerOnMap = x;
-                BottomSheetDepartureValue.setText(clickedTrain.getDeparture());
-                BottomSheetDestinationValue.setText(clickedTrain.getDestination());
-                BottomSheetTrainIdValue.setText(clickedTrain.getTrain_id());
+                BottomSheetDepartureValue.setText(clickedGeoTrain.getDeparture());
+                BottomSheetDestinationValue.setText(clickedGeoTrain.getDestination());
+                BottomSheetTrainIdValue.setText(clickedGeoTrain.getTrain_id());
+
+                previousRouteForTrackingMarker = clickedGeoTrain.getRoute_Info();
 
                 MarkerInfo = new FragMarkerInfo();
 
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("geoTrain", clickedTrain);
+                bundle.putSerializable("geoTrain", clickedGeoTrain);
                 MarkerInfo.setArguments(bundle);
                 MarkerInfo.show(getSupportFragmentManager(), "Maker_Info");
 
                 //todo: find a better way to do this
                 //try to check if the clicked train is still in the same route, if true don't call this function again
                 //because the route is still the same and we only update the index
-                LoadLatLngForClickedHistoryItem(clickedTrain.getRoute_Info());
+                LoadLatLngToArrayList(clickedGeoTrain.getRoute_Info());
 
                 //Todo : if bottom dialog takes time to reveal, do this when the user clicks on view train button in (MarkerInfoFrag)
                 // else keep it here, but you'll have to reset the current index if the user doesn't click on view train button
-                LatLng trainIndex = new LatLng(clickedTrain.getCurrent_latitude(), clickedTrain.getCurrent_longitude());
+                LatLng trainIndex = new LatLng(clickedGeoTrain.getCurrent_latitude(), clickedGeoTrain.getCurrent_longitude());
                 double formedHashValue = trainIndex.latitude * -trainIndex.longitude;
                 getClosestPoint(formedHashValue);
                 //Todo----------------------------------------------------------------------
@@ -870,35 +810,15 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void preparePathForRoute(String route){
+    public void preparePathForRoute(String route) {
 
         LoadLatLngToArrayList(route);
-    }
-
-    // executed when the history list item is clicked, for debugging it also executes when marker is clicked on map
-    public String LoadLatLngForClickedHistoryItem(String route) {
-
-        System.out.println("================Loaded Route=================");
-        System.out.println(route);
-        System.out.println("=============================================");
-        if (route.equalsIgnoreCase("Pretoria_to_Johannesburg")) {
-
-            LoadLatLngToArrayList("Pretoria_to_Johannesburg");
-
-        }
-
-        if (route.equalsIgnoreCase("Leralla_to_Johannesburg")) {
-
-            LoadLatLngToArrayList("Leralla_to_Johannesburg");
-
-        }
-
-        return route;
     }
 
     public void UpdatePrevNxtStationValues(LatLng beginLatLng, LatLng endLatLng, final int index) {
 
         // UpdateGeoFireLocation(endLatLng, "station"); Todo : geoQuery with parameters of this function
+        //Todo: from user schedules check if the coords(parameters) do match the notification station alert
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -972,7 +892,7 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    //Todo: review this function
+    //Todo: review this function : possibly use it on marker clustering when marker is animating, use another one on stations
     private Location convertLatLngToLocation(LatLng latLng) {
         Location loc = new Location("someLoc");
         loc.setLatitude(latLng.latitude);
@@ -1016,11 +936,32 @@ public class MainActivity extends AppCompatActivity
 
             } else {
 
-                String route = "Johannesburg_to_Leralla"; //Todo: swipe around departure and destination if train returns to initial station
-                changeRoute(route);
+                String route = getLatestRouteForCurrentTrain();
+
+                if (route.equalsIgnoreCase(previousRouteForTrackingMarker)){
+
+                    //todo : reset map with the following modifications:
+                    /*
+                    * reset tilt to zero
+                    * reset zoom level to home screen zoom level*/
+
+                }else {
+
+                    changeRoute(route);
+                }
+
             }
 
         }
+    }
+
+    /*
+    * returns current route for tracking marker
+    * this method is only called when the train reaches dead end station or trains terminal*/
+    private String getLatestRouteForCurrentTrain(){
+
+        String route = clickedGeoTrain.getRoute_Info();
+        return route;
     }
 
     private void changeRoute(String route) {
@@ -1113,6 +1054,8 @@ public class MainActivity extends AppCompatActivity
         StartTrainSearchFragmentButton.setVisibility(View.VISIBLE);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         latlngPoints.clear();
+        //Todo : check is stop() was called due to station delay or not, if true update the index to + 1
+        //Todo: write a function to continue animation instead of using startAnimation on station delays
         currentIndex = 0;  //Todo: if animating a moving train already, set the current index to its current latlng
 
     }
@@ -1126,11 +1069,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     //toggles map style when you click on the FAB mini button
-    public void toggleStyle() {
+    public void toggleStyle(String selectedStyle) {
         if (GoogleMap.MAP_TYPE_NORMAL == geoMap.getMapType()) {
             geoMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         } else {
             geoMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
+
+        switch (selectedStyle) {
+
+            case "Default":
+                geoMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case "Satellite":
+                geoMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+            case "Terrain":
+                geoMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+            default:
+                geoMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
         }
     }
 
@@ -1177,8 +1136,8 @@ public class MainActivity extends AppCompatActivity
 
                 ResolvedRoute = "Johannesburg_to_Leralla";
                 clearCachedData();
-                possibleRoute = routeLatLngData.LerallaJohannesburgLatLng;
-                for (int x = possibleRoute[0].length - 1; x >= 0; x--) {
+                possibleRoute = routeLatLngData.JohannesburgLerallaLatLng();
+                for (int x = 0; x < possibleRoute[0].length; x++) {
 
                     LatLng latLng = new LatLng(possibleRoute[0][x], possibleRoute[1][x]);
 
@@ -1215,17 +1174,33 @@ public class MainActivity extends AppCompatActivity
         System.out.println(hashKeyDoubleValue + " === " + GeoHashValueSet.contains(hashKeyDoubleValue));
     }
 
-    public static void upDateLinkedHashMap() {
+    public void upDateLinkedHashMap() {
 
-        double Applicable_RouteLatLng[][];
+        double Applicable_RouteLatLng[][] = new double[0][];
+        
+        switch (ResolvedRoute) {
 
-        if (ResolvedRoute.equalsIgnoreCase("Leralla_to_Johannesburg")) {
+            case "Leralla_to_Johannesburg":
 
-            Applicable_RouteLatLng = routeLatLngData.LerallaJohannesburgLatLng;
+                Applicable_RouteLatLng = routeLatLngData.LerallaJohannesburgLatLng;
+                
+                break;
 
-        } else {
+            case "Pretoria_to_Johannesburg":
 
-            Applicable_RouteLatLng = routeLatLngData.PretoriaJohannesburgLatLng;
+                Applicable_RouteLatLng = routeLatLngData.PretoriaJohannesburgLatLng;
+
+                break;
+
+            case "Johannesburg_to_Leralla":
+
+                Applicable_RouteLatLng = routeLatLngData.JohannesburgLerallaLatLng();
+
+                break;
+
+            default:
+                Toast.makeText(this, "Database Error!", Toast.LENGTH_SHORT).show();
+               
         }
 
         for (int i = 0; i < DoubleDuplicatesDetector.size(); i++) {
@@ -1245,7 +1220,7 @@ public class MainActivity extends AppCompatActivity
         GeoTreeMap.putAll(GeoLinkedHashMap);
     }
 
-    public static void getClosestPoint(Double hashValue) {
+    public void getClosestPoint(Double hashValue) {
 
         double key = hashValue;
 
@@ -1274,6 +1249,7 @@ public class MainActivity extends AppCompatActivity
             currentIndex = DoubleDuplicatesDetector.indexOf(markerIndex.latitude * -markerIndex.longitude);
 
         } else {
+
             if (low != null || high != null) {
                 res = low != null ? low.getValue() : high.getValue();
                 System.out.println("=============Closest Value==========");
@@ -1289,6 +1265,137 @@ public class MainActivity extends AppCompatActivity
         DoubleDuplicatesDetector.clear();
         GeoLinkedHashMap.clear();
         GeoHashValueSet.clear();
+    }
+
+    private void showTrainUpdatesDialog() {
+
+        final View TrainUpdatesView = View.inflate(this, R.layout.train_updates, null);
+
+        final Dialog updates_dialog = new Dialog(this, R.style.MenuDialogStyle);
+        updates_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        updates_dialog.setContentView(TrainUpdatesView);
+
+        ImageView imageView = updates_dialog.findViewById(R.id.closeTrainUpdatesDialog);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                animateDialogOnShow(TrainUpdatesView, false, updates_dialog);
+            }
+        });
+
+        updates_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                animateDialogOnShow(TrainUpdatesView, true, null);
+            }
+        });
+
+        updates_dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+
+                if (i == KeyEvent.KEYCODE_BACK) {
+
+                    animateDialogOnShow(TrainUpdatesView, false, updates_dialog);
+                    return true;
+                }
+                return false;
+            }
+
+        });
+
+        updates_dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        updates_dialog.show();
+    }
+
+    private void showMenuDialog() {
+
+        final View menuView = View.inflate(this, R.layout.menu_dialog, null);
+
+        final Dialog geo_menu = new Dialog(this, R.style.MenuDialogStyle);
+        // geo_menu.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        geo_menu.setContentView(menuView);
+
+        ImageView imageView = geo_menu.findViewById(R.id.closeMenuDialog);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                animateDialogOnShow(menuView, false, geo_menu);
+            }
+        });
+
+        geo_menu.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                animateDialogOnShow(menuView, true, null);
+            }
+        });
+
+        geo_menu.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+
+                if (i == KeyEvent.KEYCODE_BACK) {
+
+                    animateDialogOnShow(menuView, false, geo_menu);
+                    return true;
+                }
+                return false;
+            }
+
+        });
+
+        geo_menu.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        geo_menu.show();
+    }
+
+    private void animateDialogOnShow(View dialogView, boolean b, final Dialog dialog) {
+
+        final View view = dialogView.findViewById(R.id.dialog);
+
+        int w = view.getWidth();
+        int h = view.getHeight();
+
+        int endRadius = (int) Math.hypot(h, w);
+
+        int cx = (int) (navigation.findViewById(R.id.main_manu).getX() + (userNameFloatingLabel.getWidth() / 2));
+        int cy = (int) (navigation.findViewById(R.id.main_manu).getY()) + (userNameFloatingLabel.getHeight() + 56);
+
+
+        if (b) {
+            android.animation.Animator revealAnimator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, endRadius);
+
+            revealAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    view.setVisibility(View.VISIBLE);
+                }
+            });
+
+            revealAnimator.setDuration(1500);
+            revealAnimator.start();
+
+        } else {
+
+            android.animation.Animator anim =
+                    ViewAnimationUtils.createCircularReveal(view, cx, cy, endRadius, 0);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    dialog.dismiss();
+                    view.setVisibility(View.INVISIBLE);
+
+                }
+            });
+            anim.setDuration(700);
+            anim.start();
+        }
 
     }
 
@@ -1297,32 +1404,13 @@ public class MainActivity extends AppCompatActivity
 //Todo : add stations to array list with respect to their route and keep iterating through them when the initially implemented
 //Todo .... conditions are true. eg if the station is found after for loop iteration, we increase or decrease the station index
 //Todo .... this could possibly solve the initial station issue and open more flexible functionality
-                      /*      if (geoTrain.getAvailability().equalsIgnoreCase("Faulty")) {
+//Todo: use this function to resume animation after station delay
+/*
+public void scheduleTimeToLeave() {
+    final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    executorService.scheduleAtFixedRate(App::myTask, 0, 1, TimeUnit.SECONDS);
+}
 
-                            //sets a red icon for faulty trains
-                            geoMap.addMarker(new MarkerOptions()
-                                    .position(latLng)
-                                    .title(geoTrain.getDeparture() + " to " + geoTrain.getDestination())
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_faulty_train)));
-                        } else {
-
-                            if (geoTrain.getAvailability().equalsIgnoreCase("Canceled")) {
-
-                                // sets icon for canceled trains
-                                geoMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .title(geoTrain.getDeparture() + " to " + geoTrain.getDestination())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_canceled_train)));
-
-                            } else {
-
-                                //sets a normal yellow icon for active trains excluding business express
-                                geoMap.addMarker(new MarkerOptions()
-                                        .position(latLng)
-                                        .title(geoTrain.getDeparture() + " to " + geoTrain.getDestination())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapicon1)));
-
-                            }
-                        }*/
-
-
+private static void myTask() {
+    System.out.println("Running");
+}*/

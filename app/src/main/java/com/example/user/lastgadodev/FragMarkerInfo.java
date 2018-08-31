@@ -1,6 +1,7 @@
 package com.example.user.lastgadodev;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.view.LayoutInflater;
@@ -20,14 +21,8 @@ public class FragMarkerInfo extends BottomSheetDialogFragment {
     TextView destination;
     TextView train_id;
     TextView speed;
-    TextView Travelstate;
+    TextView TravelState;
     Button TrackSelectedMarker;
-    private GeoTrain clickedTrain;
-
-    //holds the train route
-   private String Route;
-
-
 
     public FragMarkerInfo() {
         // Required empty public constructor
@@ -44,15 +39,16 @@ public class FragMarkerInfo extends BottomSheetDialogFragment {
         System.out.println(data);
         View view = inflater.inflate(R.layout.frag_marker_info, container, false);
 
-        clickedTrain = (GeoTrain) data;
+        GeoTrain  clickedTrain = (GeoTrain) data;
 
-        Travelstate = view.findViewById(R.id.B_travel_state);
+        TravelState = view.findViewById(R.id.B_travel_state);
         TrackSelectedMarker = view.findViewById(R.id.TrackSelectedMarkerId);
         departure = view.findViewById(R.id.depatureTV);
         destination = view.findViewById(R.id.destinationTV);
         train_id = view.findViewById(R.id.trainID_TV);
         speed = view.findViewById(R.id.speedTV);
 
+        assert clickedTrain != null;
         departure.setText(clickedTrain.getDeparture());
         destination.setText(clickedTrain.getDestination());
         train_id.setText(clickedTrain.getTrain_id());
@@ -61,32 +57,17 @@ public class FragMarkerInfo extends BottomSheetDialogFragment {
         if(clickedTrain.getTravel_State().equalsIgnoreCase("Express")){
 
             //TODO: show a list of skipped stations
-            Travelstate.setText("Show List Of skipped stations");
+            TravelState.setText("Express");
 
         }else {
 
-            Travelstate.setText(clickedTrain.getTravel_State());
+            TravelState.setText(clickedTrain.getTravel_State());
         }
 
         TrackSelectedMarker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(clickedTrain.getDeparture().equalsIgnoreCase("Leralla")){
-
-                    Route = "Leralla_to_Johannesburg";
-
-                }else {
-
-                    Route = "Pretoria_to_Johannesburg";
-                }
-
-                System.out.println("==========Resolve My current Index and Start animating==========");
-                //clears the current route path LatLng that is stored
-               // ((MainActivity) getActivity()).latlngPoints.clear();
-                //todo:fix this glitch
-               // ((MainActivity) getActivity()).LoadLatLngForClickedHistoryItem(Route);
-                //---
                 ((MainActivity) getActivity()).startAnimation(true);
                 ((MainActivity) getActivity()).toggleBottomSheet();
                 ((MainActivity) getActivity()).StartTrainSearchFragmentButton.setVisibility(View.GONE);
@@ -98,8 +79,10 @@ public class FragMarkerInfo extends BottomSheetDialogFragment {
     }
 
     @Override
-    public void dismiss() {
-        super.dismiss();
-        //Todo : reset bottom sheet values if the track train button was not pressed. else don't reset the values, the marker is tracking/animating
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        ((MainActivity) getActivity()).clickedMarker.hideInfoWindow();
+        ((MainActivity) getActivity()).clickedMarker = null;
+        //Todo: do additional stuff if required
     }
 }

@@ -187,7 +187,7 @@ public class RouteLatLngData {
                     -26.00219,
                     -26.00334,
                     -26.00454,
-                    -26.00588,
+                    -26.00588,//oakmoor
                     -26.00747,
                     -26.00881,
                     -26.01038,
@@ -598,7 +598,7 @@ public class RouteLatLngData {
                     28.24871,
                     28.24873,
                     28.24874,
-                    28.24874,
+                    28.24875,
                     28.24877,
                     28.24885,
                     28.249,
@@ -1376,5 +1376,20 @@ public class RouteLatLngData {
                     28.0421 //Park Station
             }
     };
+
+    //this function reverses the LerallaJohannesburgLatLng array.
+    // reverse example= https://www.youtube.com/watch?v=ZIM7OlBNXXM
+    public double[][] JohannesburgLerallaLatLng() {
+
+        double[][] JHB2Larray = new double[LerallaJohannesburgLatLng[0].length][LerallaJohannesburgLatLng[0].length];
+
+        for (int x = 0; x < LerallaJohannesburgLatLng[0].length; x++) {
+
+            JHB2Larray[0][x] = LerallaJohannesburgLatLng[0][LerallaJohannesburgLatLng[0].length -1 -x];
+            JHB2Larray[1][x] = LerallaJohannesburgLatLng[1][LerallaJohannesburgLatLng[1].length -1 -x];
+        }
+
+        return JHB2Larray;
+    }
 
 }

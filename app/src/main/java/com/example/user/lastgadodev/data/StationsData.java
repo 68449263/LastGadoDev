@@ -13,39 +13,39 @@ public class StationsData {
 
     public String possibleRoute;
 
-    LatLng Pretoria = new LatLng(-25.75954, 28.18902);
-    LatLng Fonteine = new LatLng(-25.78395,   28.1932);
-    LatLng Kloofsig = new LatLng(-25.81341, 28.20113);
-    LatLng Sportpark = new LatLng(-25.82471, 28.20578);
-    LatLng Centurion = new LatLng(-25.83489, 28.21085);
-    LatLng Irene = new LatLng(-25.87535, 28.22445);
-    LatLng Pinedene = new LatLng(-25.91378, 28.22885);
-    LatLng Olifantsfontein = new LatLng(-25.96418, 28.23552);
-    LatLng Oakmoor = new LatLng(-26.00588, 28.24874);
-    LatLng Leralla = new LatLng(-26.02929, 28.19647);
-    LatLng Limindlela = new LatLng(-26.01113, 28.2148401);
-    LatLng Tembisa = new LatLng(-26.00962, 28.23133);
-    LatLng Kaalfontein = new LatLng(-26.0344, 28.25481);
-    LatLng Birchleigh = new LatLng(-26.06719, 28.23464);
-    LatLng VanRiebeeckPark = new LatLng(-26.08808, 28.22179);
-    LatLng KemptonPark = new LatLng(-26.10732, 28.22685);
-    LatLng Rhodesfield = new LatLng(-26.12752, 28.22462);
-    LatLng Isando = new LatLng(-26.13612, 28.22173);
-    LatLng Elandsfontein = new LatLng(-26.16676, 28.20548);
-    LatLng Ravensklip = new LatLng(-26.1811, 28.19973);
-    LatLng Knights = new LatLng(-26.19775, 28.19573);
-    LatLng Germiston = new LatLng(-26.20977, 28.16725);
-    LatLng President = new LatLng(-26.21143, 28.1595);
-    LatLng Driehoek = new LatLng(-26.21343, 28.14963);
-    LatLng Geldenhuis = new LatLng(-26.20806, 28.13293);
-    LatLng Cleveland = new LatLng(-26.20852, 28.11839);
-    LatLng Tooronga = new LatLng(-26.20421, 28.11051);
-    LatLng Denver = new LatLng(-26.20594, 28.0971);
-    LatLng GeorgeGoch = new LatLng(-26.20764, 28.08043);
-    LatLng Jeppe = new LatLng(-26.204, 28.06345);
-    LatLng Ellispark = new LatLng(-26.19895, 28.05904);
-    LatLng Doorfotein = new LatLng(-26.19716, 28.0542);
-    LatLng Johannesburg = new LatLng(-26.19746, 28.0422);
+    private LatLng Pretoria = new LatLng(-25.75954, 28.18902);
+    private LatLng Fonteine = new LatLng(-25.78395,   28.1932);
+    private LatLng Kloofsig = new LatLng(-25.81341, 28.20113);
+    private  LatLng Sportpark = new LatLng(-25.82471, 28.20578);
+    private  LatLng Centurion = new LatLng(-25.83489, 28.21085);
+    private  LatLng Irene = new LatLng(-25.87535, 28.22445);
+    private  LatLng Pinedene = new LatLng(-25.91378, 28.22885);
+    private  LatLng Olifantsfontein = new LatLng(-25.96418, 28.23552);
+    private  LatLng Oakmoor = new LatLng(-26.00588, 28.24874);
+    private  LatLng Leralla = new LatLng(-26.02929, 28.19647);
+    private  LatLng Limindlela = new LatLng(-26.01113, 28.2148401);
+    private  LatLng Tembisa = new LatLng(-26.00962, 28.23133);
+    private   LatLng Kaalfontein = new LatLng(-26.0344, 28.25481);
+    private   LatLng Birchleigh = new LatLng(-26.06719, 28.23464);
+    private  LatLng VanRiebeeckPark = new LatLng(-26.08808, 28.22179);
+    private  LatLng KemptonPark = new LatLng(-26.10732, 28.22685);
+    private  LatLng Rhodesfield = new LatLng(-26.12752, 28.22462);
+    private  LatLng Isando = new LatLng(-26.13612, 28.22173);
+    private  LatLng Elandsfontein = new LatLng(-26.16676, 28.20548);
+    private  LatLng Ravensklip = new LatLng(-26.1811, 28.19973);
+    private  LatLng Knights = new LatLng(-26.19775, 28.19573);
+    private  LatLng Germiston = new LatLng(-26.20977, 28.16725);
+    private  LatLng President = new LatLng(-26.21143, 28.1595);
+    private  LatLng Driehoek = new LatLng(-26.21343, 28.14963);
+    private  LatLng Geldenhuis = new LatLng(-26.20806, 28.13293);
+    private  LatLng Cleveland = new LatLng(-26.20852, 28.11839);
+    private  LatLng Tooronga = new LatLng(-26.20421, 28.11051);
+    private  LatLng Denver = new LatLng(-26.20594, 28.0971);
+    private  LatLng GeorgeGoch = new LatLng(-26.20764, 28.08043);
+    private  LatLng Jeppe = new LatLng(-26.204, 28.06345);
+  //  LatLng Ellispark = new LatLng(-26.19895, 28.05904);
+    private  LatLng Doorfotein = new LatLng(-26.19716, 28.0542);
+    private  LatLng Johannesburg = new LatLng(-26.19746, 28.0422);
 
     // Don't Rearrange the array here! very important
     public LatLng[] Stations = {
@@ -79,7 +79,7 @@ public class StationsData {
             Denver,
             GeorgeGoch,
             Jeppe,
-            Ellispark,
+          //  Ellispark,
             Doorfotein,
             Johannesburg
     };
@@ -116,7 +116,7 @@ public class StationsData {
             "Denver",
             "GeorgeGoch",
             "Jeppe",
-            "Ellispark",
+          //  "Ellispark",
             "Doorfotein",
             "Johannesburg"
     };
