@@ -54,7 +54,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
     public RecyclerView GeoSearchHistory;
     private SearchResultsListAdapter mSearchResultsAdapter;
     private SearchHistoryListAdapter searchHistoryListAdapter;
-    List<GeoTrain> geoTrainsList = new ArrayList<>();
+    ArrayList<GeoTrain> geoTrainsList = new ArrayList<>();
     public List<String> SearchedPossibleRoutes = new ArrayList<>();
     public List<String> Leralla_to_JHB_and_SubRoutes = new ArrayList<>();
     public List<String> Pretoria_to_JHB_and_SubRoutes = new ArrayList<>();
@@ -135,10 +135,21 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
             @Override
             public void onClick(View view) {
 
-                //clears the current route path that is stored
-                ((MainActivity) getActivity()).latlngPoints.clear();
-                //gets the possible route based on user inputs
-                FindPossibleRoute();
+                if (DepartureACTV.getText().toString().equalsIgnoreCase("")||  DestinationACTV.getText().toString().equalsIgnoreCase("")){
+
+                    Toast.makeText(getContext(),
+                            String.format("Insert all values."),
+                            Toast.LENGTH_SHORT).show();
+
+                }else {
+
+                    //clears the current route path that is stored
+                    ((MainActivity) getActivity()).latlngPoints.clear();
+                    //gets the possible route based on user inputs
+                    FindPossibleRoute();
+                }
+
+
 
             }
         });
@@ -178,35 +189,14 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         SearchedPossibleRoutes.add("Pretoria_to_Germiston");
         SearchedPossibleRoutes.add("Pretoria_to_Elandsfontein");
 
-        SearchedPossibleRoutes.add("Leralla_to_Isando");
+/*        SearchedPossibleRoutes.add("Leralla_to_Isando");
         SearchedPossibleRoutes.add("Leralla_to_KemptonPark");
         SearchedPossibleRoutes.add("Pretoria_to_Johannesburg");
         SearchedPossibleRoutes.add("Pretoria_to_Germiston");
-        SearchedPossibleRoutes.add("Pretoria_to_Elandsfontein");
+        SearchedPossibleRoutes.add("Pretoria_to_Elandsfontein");*/
 
         searchHistoryListAdapter.populateSearchHistory(SearchedPossibleRoutes);
 
-/*        ArrayAdapter<String> HistoryArrayAdapter = new ArrayAdapter<String>(
-                getActivity(),
-                R.layout.history_list_item,
-                R.id.history_value_tv,
-                SearchedPossibleRoutes);
-
-        search_history_list.setAdapter(HistoryArrayAdapter);
-        search_history_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println("============Clicked ListView Item===========");
-                System.out.println(i);
-                System.out.println(search_history_list.getItemAtPosition(i));
-                System.out.println("--------------------------------------------");
-                //loads path LatLng coordinates to selected routes, then it returns the route to query Firebase database
-                possible_route =  ((MainActivity) getActivity()).LoadLatLngForClickedHistoryItem(search_history_list.getItemAtPosition(i).toString());
-                //Queries Firebase Database
-                getAvailableTrains(possible_route);
-
-            }
-        });*/
     }
 
 
@@ -224,7 +214,10 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
 
     private void getAvailableTrains(final String possible_route) {
 
-        reference = database.getReference("Routes/" + possible_route + "/Train_IDs/");
+        //todo: this is only used for MTN awards to work with one route instead, remove it once everything is resolved accordingly
+       final String RouteForMTN = "Leralla_to_Germiston";//use possible route afterwards release
+
+        reference = database.getReference("Routes/" + RouteForMTN + "/Train_IDs/");
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -232,12 +225,8 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
 
                 if (dataSnapshot != null) {
 
-                    System.out.println("-----------------Data Changed On search Results--------------------");
-                    System.out.println(possible_route);
-                    System.out.println(dataSnapshot);
-                    System.out.println("-------------------------------------------------");
-
                     prepareListOfAvailableTrains(dataSnapshot);
+                    //hides the text input fields when the results are returned from the database
                     searchFieldsCard.setVisibility(View.GONE);
 
                 } else {
@@ -266,6 +255,9 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
 
             geoTrainsList.add(geoTrain);
         }
+
+        //here we update the all the geoTrainLists with the latest data that we just pulled from the Database
+      //  ((MainActivity) getActivity()).geoTrainsList = geoTrainsList;
 
         sortTrainsByRoute();
         setupSectionedRecyclerView();
@@ -347,6 +339,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
 
     }
 
+    //TODO: Remove this function its useless since it doesn't resolve the Train index
     @Override
     public void onClick(View view, int pos) {
 
@@ -354,8 +347,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         System.out.println(SearchedPossibleRoutes.get(pos));
         TrainItemClicked(pos);
     }
-
-
+    //TODO: Remove this function and its override they are useless since they don't resolve the Train index
     //executes when the list item that shows available trains is clicked
     public void TrainItemClicked(int clickedRoute) {
 
@@ -368,6 +360,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         dismiss();
 
     }
+    //todo remove ------------------------------------------------------------------------------------------
 
     @Override
     public void onClickedHistory(View view, int pos) {
@@ -419,38 +412,26 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
 
     }
 
-    //---------------------------------------------sectioned recycler view
+    //---------------------------------------------sectioned recycler view---------------------------------------
 
     private void setupSectionedRecyclerView() {
 
         sectionAdapter = new SectionedRecyclerViewAdapter();
 
-        sectionAdapter.addSection(new ContactsSection("Leralla to Johannesburg", GeoTrains_Leralla_to_Johannesburg));
-        sectionAdapter.addSection(new ContactsSection("Leralla to Germiston", GeoTrains_Leralla_to_Germiston));
-        sectionAdapter.addSection(new ContactsSection("Leralla to Elandsfontein", GeoTrains_Leralla_to_Elandsfontein));
+        sectionAdapter.addSection(new RouteSection("Leralla to Johannesburg", GeoTrains_Leralla_to_Johannesburg));
+        sectionAdapter.addSection(new RouteSection("Leralla to Germiston", GeoTrains_Leralla_to_Germiston));
+        sectionAdapter.addSection(new RouteSection("Leralla to Elandsfontein", GeoTrains_Leralla_to_Elandsfontein));
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(sectionAdapter);
     }
 
-    private List<String> getContactsWithLetter(char letter) {
-        List<String> contacts = new ArrayList<>();
-
-        for (String contact : getResources().getStringArray(R.array.StationNames)) {
-            if (contact.charAt(0) == letter) {
-                contacts.add(contact);
-            }
-        }
-
-        return contacts;
-    }
-
-    public class ContactsSection extends StatelessSection {
+    public class RouteSection extends StatelessSection {
 
         String title;
         List<GeoTrain> list;
 
-        ContactsSection(String title, List<GeoTrain> list) {
+        RouteSection(String title, List<GeoTrain> list) {
             super(SectionParameters.builder()
                     .itemResourceId(R.layout.search_results_list_item2)
                     .headerResourceId(R.layout.section_header)
@@ -484,12 +465,30 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
                 @Override
                 public void onClick(View view) {
 
-                    GeoTrain selectedTrain = geoTrainsList.get(sectionAdapter.getPositionInSection(itemHolder.getAdapterPosition()));
-                    Toast.makeText(getContext(),
-                            String.format("Clicked on position #%s of Section %s",
-                                    sectionAdapter.getPositionInSection(itemHolder.getAdapterPosition()),
-                                    title),
-                            Toast.LENGTH_SHORT).show();
+                    int position = sectionAdapter.getPositionInSection(itemHolder.getAdapterPosition());
+                    GeoTrain selectedTrain = geoTrainsList.get(position);
+                    //here we try to get the train index on the map
+                    for (int x = 0; x <((MainActivity) getActivity()).TrainMarkers.keySet().size(); x++) {
+
+                        if (((MainActivity) getActivity()).TrainMarkers.containsKey(selectedTrain.getTrain_id())) {
+
+                            position = x;
+
+                        }
+
+                    }
+
+                   //here we make sure that the index doesn't get out of bounds
+                    if (position == 0){
+                        position = 1;
+                    }
+
+                    //here we subtract 1, because array starts to count from 0
+                    GeoTrain TrainOnMap = geoTrainsList.get(position - 1);
+
+
+                    ((MainActivity) getActivity()).prepareUIforAnimation(TrainOnMap,position,true);
+                    dismiss();
 
                 }
             });
@@ -552,3 +551,11 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         }
     }
 }
+
+//string format example
+/*
+                    Toast.makeText(getContext(),
+                            String.format("Clicked on position #%s of Section %s",
+                            sectionAdapter.getPositionInSection(itemHolder.getAdapterPosition()),
+                            title),
+                            Toast.LENGTH_SHORT).show();*/

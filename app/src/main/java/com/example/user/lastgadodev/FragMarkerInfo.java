@@ -22,6 +22,7 @@ public class FragMarkerInfo extends BottomSheetDialogFragment {
     TextView train_id;
     TextView speed;
     TextView TravelState;
+    TextView NextStation;
     Button TrackSelectedMarker;
 
     public FragMarkerInfo() {
@@ -47,12 +48,14 @@ public class FragMarkerInfo extends BottomSheetDialogFragment {
         destination = view.findViewById(R.id.destinationTV);
         train_id = view.findViewById(R.id.trainID_TV);
         speed = view.findViewById(R.id.speedTV);
+        NextStation = view.findViewById(R.id.nextStationValueTV);
 
         assert clickedTrain != null;
         departure.setText(clickedTrain.getDeparture());
         destination.setText(clickedTrain.getDestination());
         train_id.setText(clickedTrain.getTrain_id());
         speed.setText(Double.toString(clickedTrain.getCurrent_Speed())+" km/h");
+        NextStation.setText(String.format("%s Station",clickedTrain.getNextStation()));
 
         if(clickedTrain.getTravel_State().equalsIgnoreCase("Express")){
 

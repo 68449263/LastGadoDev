@@ -16,8 +16,27 @@ public class GeoTrain implements Serializable{
     private String Travel_Class;
     private String Travel_State;
     private String Route_Info;
+    private String NextStation;
+    private String TrainStatus; // possible values = changedRoute, parked, airBreak,atDestination
 
     public GeoTrain(){}
+
+    public GeoTrain(String train_id, String departure, String destination, String departure_Time, String arrival_Time, double current_Speed, double current_latitude, double current_longitude, String availability, String travel_Class, String travel_State, String route_Info, String nextStation, String trainStatus) {
+        Train_id = train_id;
+        Departure = departure;
+        Destination = destination;
+        Departure_Time = departure_Time;
+        Arrival_Time = arrival_Time;
+        Current_Speed = current_Speed;
+        Current_latitude = current_latitude;
+        Current_longitude = current_longitude;
+        Availability = availability;
+        Travel_Class = travel_Class;
+        Travel_State = travel_State;
+        Route_Info = route_Info;
+        NextStation = nextStation;
+        TrainStatus = trainStatus;
+    }
 
     public GeoTrain(String train_id, String departure, String destination, String departure_Time, String arrival_Time, double current_Speed, double current_latitude, double current_longitude, String availability, String travel_Class, String travel_State, String route_Info) {
         Train_id = train_id;
@@ -130,4 +149,19 @@ public class GeoTrain implements Serializable{
         Route_Info = route_Info;
     }
 
+    public String getNextStation() {
+        return NextStation;
+    }
+
+    public void setNextStation(String nextStation) {
+        NextStation = nextStation;
+    }
+
+    public String getTrainStatus() {
+        return TrainStatus;
+    }
+
+    public void setTrainStatus(String trainStatus) {
+        TrainStatus = trainStatus;
+    }
 }

@@ -2,6 +2,8 @@ package com.example.user.lastgadodev.data;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.LinkedHashMap;
+
 public class RouteLatLngData {
 
     public double[][] PretoriaJohannesburgLatLng = {
@@ -224,7 +226,7 @@ public class RouteLatLngData {
                     -26.06354,
                     -26.0649,
                     -26.06598,
-                    -26.06719,
+                    -26.06719,//Birchleigh
                     -26.06832,
                     -26.06981,
                     -26.07166,
@@ -446,7 +448,7 @@ public class RouteLatLngData {
                     28.19864,
                     28.19954,
                     28.20044,
-                    28.20113,
+                    28.20113,//kloofsig
                     28.20156,
                     28.20188,
                     28.20227,
@@ -456,7 +458,7 @@ public class RouteLatLngData {
                     28.20429,
                     28.20492,
                     28.20529,
-                    28.20578,
+                    28.20578,//sportspark
                     28.20644,
                     28.2071,
                     28.20765,
@@ -848,7 +850,7 @@ public class RouteLatLngData {
                     -26.01374,
                     -26.01282,
                     -26.01175,
-                    -26.01113,
+                    -26.01113,//Limindlela
                     -26.00953,
                     -26.00899,
                     -26.0085,
@@ -1119,7 +1121,7 @@ public class RouteLatLngData {
                     28.214,
                     28.2144,
                     28.21468,
-                    28.21484,
+                    28.21481,
                     28.21495,
                     28.2149,
                     28.21484,
@@ -1391,5 +1393,22 @@ public class RouteLatLngData {
 
         return JHB2Larray;
     }
+
+    //this function reverses the PretoriaJohannesburgLatLng array.
+    // reverse example= https://www.youtube.com/watch?v=ZIM7OlBNXXM
+    public double[][] JohannesburgPretoriaLatLng() {
+
+        double[][] JHB2Parray = new double[PretoriaJohannesburgLatLng[0].length][PretoriaJohannesburgLatLng[0].length];
+
+        for (int x = 0; x < LerallaJohannesburgLatLng[0].length; x++) {
+
+            JHB2Parray[0][x] = PretoriaJohannesburgLatLng[0][PretoriaJohannesburgLatLng[0].length -1 -x];
+            JHB2Parray[1][x] = PretoriaJohannesburgLatLng[1][PretoriaJohannesburgLatLng[1].length -1 -x];
+        }
+
+        return JHB2Parray;
+    }
+
+    public LinkedHashMap<Double, LatLng> JHBLatLngAndStationName = new LinkedHashMap<>();
 
 }

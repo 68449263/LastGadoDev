@@ -22,7 +22,6 @@ public class SearchHistoryListAdapter extends RecyclerView.Adapter<com.example.u
 
     private OnItemClickListener HistoryItemsOnClickListener;
 
-    //TODO: this executes when the user clicks the list item instead of the tracktrain button
     public void setItemsOnClickListener(OnItemClickListener onClickListener) {
         this.HistoryItemsOnClickListener = onClickListener;
     }

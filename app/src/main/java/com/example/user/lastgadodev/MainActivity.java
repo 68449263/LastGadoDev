@@ -105,11 +105,11 @@ public class MainActivity extends AppCompatActivity
     public LatLng beginLatLng = null;
 
     boolean showPolyline = false;
-    public Marker TrackingGeoMarker;
-    private Circle TrackingGeoCircle;
+    public static Marker TrackingGeoMarker;
+    public static Circle TrackingGeoCircle;
     public boolean TrackingMarkerIsAnimating = false;
 
-    public int selectedMarkerOnMap;// holds the index of clicked marker
+    public static int selectedMarkerOnMap;// holds the index of clicked marker
 
     public static List<LatLng> latlngPoints = new ArrayList();
     //---------------------------------------------------
@@ -120,9 +120,13 @@ public class MainActivity extends AppCompatActivity
     public static LinkedHashMap<Double, LatLng> GeoLinkedHashMap = new LinkedHashMap<>();
     // used to hold hashValues generated from LatLng
     public static Set<Double> GeoHashValueSet = new HashSet<>();
-
     public static String ResolvedRoute;
 
+    //holds path LatLng and the Station in which it belongs too.
+    public static LinkedHashMap<LatLng,String> LerallatoJHBLatLngAndStationName = new LinkedHashMap<>();
+    public static LinkedHashMap<LatLng,String> PTAtoJHBLatLngAndStationName = new LinkedHashMap<>();
+    public LinkedHashMap<LatLng,String> JHBtoPTALatLngAndStationName = new LinkedHashMap<>();
+    public LinkedHashMap<LatLng,String> JHBtoLerallaLatLngAndStationName = new LinkedHashMap<>();
     //----------------------------------------------------------------------------------------
 
     //---- Butter knife binding
@@ -150,7 +154,7 @@ public class MainActivity extends AppCompatActivity
     GeoQuery geoQuery;
 
     //Collection of Markers
-    private HashMap<String, Marker> TrainMakers = new HashMap<>();
+    public HashMap<String, Marker> TrainMarkers = new HashMap<>();
     ArrayList<String> TrainIDs = new ArrayList<>();
     //holds all the geotrains objects from the firebase database
     ArrayList<GeoTrain> geoTrainsList = new ArrayList<>();
@@ -178,14 +182,17 @@ public class MainActivity extends AppCompatActivity
 
     public BottomNavigationView navigation;
 
+    public DatabaseReference reference;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        //allows new makers to be placed on the map
-        activityStart = true;
+
+        activityStart = true; //allows new makers to be placed on the map
         TrainIDs.clear();
         geoTrainsList.clear();
         clearCachedData();
@@ -198,11 +205,9 @@ public class MainActivity extends AppCompatActivity
 
         //firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference("Routes/Leralla_to_Johannesburg/Train_IDs/");
+        reference = database.getReference("Routes/Leralla_to_Germiston/Train_IDs/");
 
         geoFire = new GeoFire(reference);
-
-        ArrayList<GeoTrain> geoTrainsList = new ArrayList<>();
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -223,9 +228,6 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(getApplicationContext(), "Terminating Process!", Toast.LENGTH_SHORT).show();
             }
         });
-
-        //sets animator interface to this activity
-        // animator.TrainPositions(this);
 
         AdditionalSetup(); //sets up buttons, fragments etc, and their event listeners
     }
@@ -326,7 +328,7 @@ public class MainActivity extends AppCompatActivity
 
                 case R.id.profile:
 
-                    showBottomSheetProfile();
+                    showBottomNavProfile();
 
                     return false;
 
@@ -353,7 +355,7 @@ public class MainActivity extends AppCompatActivity
         dialog.show();
     }
 
-    public void showBottomSheetProfile() {
+    public void showBottomNavProfile() {
 
         final View view = getLayoutInflater().inflate(R.layout.new_profile, null);
         final BottomSheetDialog dialog = new BottomSheetDialog(this);
@@ -544,7 +546,7 @@ public class MainActivity extends AppCompatActivity
                     TextView depatureTime = v.findViewById(R.id.DepartureTime);
                     depatureTime.setText("Departs at " + clickedGeoTrain.getDeparture_Time());
 
-                    TextView trainIdTv =  v.findViewById(R.id.ArrivalTime);
+                    TextView trainIdTv = v.findViewById(R.id.ArrivalTime);
                     trainIdTv.setText("Arrives at " + clickedGeoTrain.getArrival_Time());
 
                 } catch (Exception ev) {
@@ -607,13 +609,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     @Override
     public void onMapClick(LatLng latLng) {
 
         //TODO: ON MAP Click get the location from the LatLng parameter above, and search for train that will pass by the location
     }
-
 
     public void onLocationChangeUpdater(DataSnapshot snapshot) {
         //Only manipulate the map, when it is ready else it will throw an exception
@@ -641,7 +641,7 @@ public class MainActivity extends AppCompatActivity
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapicon1)));
 
                         //add the trains in to the markers hash map.
-                        TrainMakers.put(geoTrain.getTrain_id(), geoMarker);
+                        TrainMarkers.put(geoTrain.getTrain_id(), geoMarker);
                         //Add the device ID so we can navigate, show data about different devices later. or search by train ID
                         TrainIDs.add(geoTrain.getTrain_id());
                     }
@@ -661,14 +661,14 @@ public class MainActivity extends AppCompatActivity
                         NewGeoTrainsList.add(geoTrain);
 
                         //update the hash map data
-                        if (TrainMakers.containsKey(geoTrain.getTrain_id())) {
+                        if (TrainMarkers.containsKey(geoTrain.getTrain_id())) {
 
                             System.out.println("--------------The marker exists----------------");
 
-                            final Marker newTrain = TrainMakers.get(geoTrain.getTrain_id());
-                           // newTrain.setPosition(new LatLng(geoTrain.getCurrent_latitude(), geoTrain.getCurrent_longitude()));
-                           // geoQuery = geoFire.queryAtLocation(new GeoLocation(latLng.latitude, latLng.longitude), 0.5f);
-                          //  geoQueryListener(geoQuery);
+                            final Marker newTrain = TrainMarkers.get(geoTrain.getTrain_id());
+                            // newTrain.setPosition(new LatLng(geoTrain.getCurrent_latitude(), geoTrain.getCurrent_longitude()));
+                            // geoQuery = geoFire.queryAtLocation(new GeoLocation(latLng.latitude, latLng.longitude), 0.5f);
+                            //  geoQueryListener(geoQuery);
 
 
                         } else {
@@ -759,55 +759,79 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        clickedMarker = marker;
+        if (TrackingMarkerIsAnimating) {
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(marker.getPosition())
-                .zoom(geoMap.getCameraPosition().zoom >= 9.9f ? geoMap.getCameraPosition().zoom : 9.9f)
-                .build();
+            Toast.makeText(this,
+                    String.format("Not Allowed"),
+                    Toast.LENGTH_SHORT).show();
 
-        geoMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        } else {
+            clickedMarker = marker;
 
-        for (int x = 0; x < TrainMakers.keySet().size(); x++) {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(marker.getPosition())
+                    .zoom(geoMap.getCameraPosition().zoom >= 9.9f ? geoMap.getCameraPosition().zoom : 9.9f)
+                    .build();
 
-            if (marker.equals(TrainMakers.get(TrainIDs.get(x)))) {
+            geoMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                marker.showInfoWindow();
+            for (int x = 0; x < TrainMarkers.keySet().size(); x++) {
 
-                clickedGeoTrain = geoTrainsList.get(x);
+                if (marker.equals(TrainMarkers.get(TrainIDs.get(x)))) {
 
-                //update the clicked maker index
-                //Todo : if tracking marker is animating don't update the bottom sheet values to a non animating marker that is clicked.
-                selectedMarkerOnMap = x;
-                BottomSheetDepartureValue.setText(clickedGeoTrain.getDeparture());
-                BottomSheetDestinationValue.setText(clickedGeoTrain.getDestination());
-                BottomSheetTrainIdValue.setText(clickedGeoTrain.getTrain_id());
+                    marker.showInfoWindow();
 
-                previousRouteForTrackingMarker = clickedGeoTrain.getRoute_Info();
+                    clickedGeoTrain = geoTrainsList.get(x);
 
-                MarkerInfo = new FragMarkerInfo();
+                    MarkerInfo = new FragMarkerInfo();
 
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("geoTrain", clickedGeoTrain);
-                MarkerInfo.setArguments(bundle);
-                MarkerInfo.show(getSupportFragmentManager(), "Maker_Info");
+                    prepareUIforAnimation(clickedGeoTrain, x, false);
+                    
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("geoTrain", clickedGeoTrain);
+                    MarkerInfo.setArguments(bundle);
+                    MarkerInfo.show(getSupportFragmentManager(), "Maker_Info");
 
-                //todo: find a better way to do this
-                //try to check if the clicked train is still in the same route, if true don't call this function again
-                //because the route is still the same and we only update the index
-                LoadLatLngToArrayList(clickedGeoTrain.getRoute_Info());
-
-                //Todo : if bottom dialog takes time to reveal, do this when the user clicks on view train button in (MarkerInfoFrag)
-                // else keep it here, but you'll have to reset the current index if the user doesn't click on view train button
-                LatLng trainIndex = new LatLng(clickedGeoTrain.getCurrent_latitude(), clickedGeoTrain.getCurrent_longitude());
-                double formedHashValue = trainIndex.latitude * -trainIndex.longitude;
-                getClosestPoint(formedHashValue);
-                //Todo----------------------------------------------------------------------
-
+                }
             }
+
+        }
+        return true;
+    }
+
+    public void prepareUIforAnimation(GeoTrain clickedGeoTrain, int x, boolean listItemClick) {
+
+        //we update the local clickedGeoTrain with the one from list item
+        this.clickedGeoTrain = clickedGeoTrain;
+
+        //update the clicked maker index
+        //Todo : if tracking marker is animating don't update the bottom sheet values to a non animating marker that is clicked.
+        selectedMarkerOnMap = x;
+        BottomSheetDepartureValue.setText(clickedGeoTrain.getDeparture());
+        BottomSheetDestinationValue.setText(clickedGeoTrain.getDestination());
+        BottomSheetTrainIdValue.setText(clickedGeoTrain.getTrain_id());
+
+        previousRouteForTrackingMarker = clickedGeoTrain.getRoute_Info();
+
+        //todo: find a better way to do this
+        //try to check if the clicked train is still in the same route, if true don't call this function again
+        //because the route is still the same and we only update the index
+        LoadLatLngToArrayList(clickedGeoTrain.getRoute_Info());
+
+        //Todo : if bottom dialog takes time to reveal, do this when the user clicks on view train button in (MarkerInfoFrag)
+        // else keep it here, but you'll have to reset the current index if the user doesn't click on view train button
+        LatLng trainIndex = new LatLng(clickedGeoTrain.getCurrent_latitude(), clickedGeoTrain.getCurrent_longitude());
+        double formedHashValue = trainIndex.latitude * -trainIndex.longitude;
+        getClosestPoint(formedHashValue);
+        //Todo----------------------------------------------------------------------
+
+        if (listItemClick) {
+
+            startAnimation(true);
+            toggleBottomSheet();
+            StartTrainSearchFragmentButton.setVisibility(View.GONE);
         }
 
-        return true;
     }
 
     public void preparePathForRoute(String route) {
@@ -829,7 +853,6 @@ public class MainActivity extends AppCompatActivity
             }
         }, 2000);
     }
-
 
     public void startAnimation(boolean showPolyLineToDestination) {
         if (latlngPoints.size() > 2) {
@@ -855,7 +878,7 @@ public class MainActivity extends AppCompatActivity
     private void setupCameraPositionForMovement(LatLng markerPos, LatLng secondPos) {
         float bearing = bearingBetweenLatLngs(markerPos, secondPos);
 
-        TrackingGeoMarker = TrainMakers.get(TrainIDs.get(selectedMarkerOnMap));
+        TrackingGeoMarker = TrainMarkers.get(TrainIDs.get(selectedMarkerOnMap));
 
         TrackingGeoCircle = geoMap.addCircle(new CircleOptions()
                 .center(markerPos)
@@ -920,6 +943,12 @@ public class MainActivity extends AppCompatActivity
         TrackingGeoCircle.setCenter(newPosition);
         TrackingGeoMarker.setPosition(newPosition);
 
+/*        reference.child(clickedGeoTrain.getTrain_id())
+                .child("Current_latitude").setValue(endLatLng.latitude);
+
+        reference.child(clickedGeoTrain.getTrain_id())
+                .child("Current_longitude").setValue(endLatLng.longitude);*/
+
         if (showPolyline) {
             // Todo: updatePolyLine(newPosition), if the departure to destination is highlighted with a different color
         }
@@ -938,14 +967,14 @@ public class MainActivity extends AppCompatActivity
 
                 String route = getLatestRouteForCurrentTrain();
 
-                if (route.equalsIgnoreCase(previousRouteForTrackingMarker)){
+                if (route.equalsIgnoreCase(previousRouteForTrackingMarker)) {
 
                     //todo : reset map with the following modifications:
                     /*
-                    * reset tilt to zero
-                    * reset zoom level to home screen zoom level*/
+                     * reset tilt to zero
+                     * reset zoom level to home screen zoom level*/
 
-                }else {
+                } else {
 
                     changeRoute(route);
                 }
@@ -956,9 +985,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     /*
-    * returns current route for tracking marker
-    * this method is only called when the train reaches dead end station or trains terminal*/
-    private String getLatestRouteForCurrentTrain(){
+     * returns current route for tracking marker
+     * this method is only called when the train reaches dead end station or trains terminal*/
+    private String getLatestRouteForCurrentTrain() {
 
         String route = clickedGeoTrain.getRoute_Info();
         return route;
@@ -1013,22 +1042,11 @@ public class MainActivity extends AppCompatActivity
 
             if (latlngPoints.get(currentIndex).latitude == stations_data.Stations[x].latitude || latlngPoints.get(currentIndex).longitude == stations_data.Stations[x].longitude) {
 
-                final int index = x;
-
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        nextStationValue.setText(stations_data.StationNames[index + 1]);
-                    }
-                }, 2000);
-
                 //updates the floating cardView of previous next station labels
                 UpdatePrevNxtStationValues(endLatLng, beginLatLng, x);
 
                 try {
-                    TimeUnit.SECONDS.sleep(6);
+                    TimeUnit.SECONDS.sleep(3);
                     //    TimeUnit.MINUTES.sleep(1);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
@@ -1036,7 +1054,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        return latlngPoints.get(currentIndex + 1);
+       return latlngPoints.get(currentIndex + 1);
     }
 
     public LatLng getBeginLatLng() {
@@ -1044,7 +1062,6 @@ public class MainActivity extends AppCompatActivity
         return latlngPoints.get(currentIndex);
     }
 
-    //-------------------------------- very important make use of it ------------------------------------
     public void stop() {
 
         mHandler.removeCallbacks(this);
@@ -1101,6 +1118,7 @@ public class MainActivity extends AppCompatActivity
 
             case "Leralla_to_Johannesburg":
 
+                int StationIndex = 9;
                 ResolvedRoute = "Leralla_to_Johannesburg";
                 clearCachedData();
                 possibleRoute = routeLatLngData.LerallaJohannesburgLatLng;
@@ -1110,7 +1128,20 @@ public class MainActivity extends AppCompatActivity
 
                     upDateDuplicatesDetectorArray(latLng);
                     latlngPoints.add(latLng);
+
+                    LerallatoJHBLatLngAndStationName.put(latLng,stations_data.StationNames[StationIndex]);
+
+                    if (latLng.latitude == stations_data.Stations[StationIndex].latitude || latLng.longitude == stations_data.Stations[StationIndex].longitude) {
+
+                        StationIndex++;//moves to next station
+
+                    }
+
                 }
+
+                System.out.println("===========Station Data Leralla To JHB=========");
+                System.out.println(LerallatoJHBLatLngAndStationName);
+                System.out.println("===============================================");
 
                 upDateLinkedHashMap();
 
@@ -1118,6 +1149,7 @@ public class MainActivity extends AppCompatActivity
 
             case "Pretoria_to_Johannesburg":
 
+                int StationIndex2 = 0;
                 ResolvedRoute = "Pretoria_to_Johannesburg";
                 clearCachedData();
                 possibleRoute = routeLatLngData.PretoriaJohannesburgLatLng;
@@ -1126,13 +1158,43 @@ public class MainActivity extends AppCompatActivity
                     LatLng latLng = new LatLng(possibleRoute[0][x], possibleRoute[1][x]);
                     upDateDuplicatesDetectorArray(latLng);
                     latlngPoints.add(latLng);
+
+                    PTAtoJHBLatLngAndStationName.put(latLng,stations_data.StationNames[StationIndex2]);
+
+                    if (latLng.longitude == stations_data.Stations[StationIndex2].longitude || latLng.latitude == stations_data.Stations[StationIndex2].latitude) {
+
+                        StationIndex2++;//moves to next station
+
+                    }
+
                 }
+
+                System.out.println("===========Station Data Pretoria To JHB=========");
+                System.out.println(PTAtoJHBLatLngAndStationName);
+                System.out.println("================================================");
 
                 upDateLinkedHashMap();
 
                 break;
 
             case "Johannesburg_to_Leralla":
+
+                ResolvedRoute = "Johannesburg_to_Leralla";
+                clearCachedData();
+                possibleRoute = routeLatLngData.JohannesburgLerallaLatLng();
+                for (int x = 0; x < possibleRoute[0].length; x++) {
+
+                    LatLng latLng = new LatLng(possibleRoute[0][x], possibleRoute[1][x]);
+
+                    upDateDuplicatesDetectorArray(latLng);
+                    latlngPoints.add(latLng);
+                }
+
+                upDateLinkedHashMap();
+
+                break;
+
+            case "Leralla_to_Germiston"://Todo make it end at germiston
 
                 ResolvedRoute = "Johannesburg_to_Leralla";
                 clearCachedData();
@@ -1167,23 +1229,20 @@ public class MainActivity extends AppCompatActivity
 
         double hashKeyDoubleValue = Double.parseDouble(hashkey);
 
-        //double type values
         DoubleDuplicatesDetector.add(hashKeyDoubleValue);
         GeoHashValueSet.add(hashKeyDoubleValue);
-
-        System.out.println(hashKeyDoubleValue + " === " + GeoHashValueSet.contains(hashKeyDoubleValue));
     }
 
     public void upDateLinkedHashMap() {
 
         double Applicable_RouteLatLng[][] = new double[0][];
-        
+
         switch (ResolvedRoute) {
 
             case "Leralla_to_Johannesburg":
 
                 Applicable_RouteLatLng = routeLatLngData.LerallaJohannesburgLatLng;
-                
+
                 break;
 
             case "Pretoria_to_Johannesburg":
@@ -1200,7 +1259,7 @@ public class MainActivity extends AppCompatActivity
 
             default:
                 Toast.makeText(this, "Database Error!", Toast.LENGTH_SHORT).show();
-               
+
         }
 
         for (int i = 0; i < DoubleDuplicatesDetector.size(); i++) {
@@ -1218,6 +1277,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         GeoTreeMap.putAll(GeoLinkedHashMap);
+
     }
 
     public void getClosestPoint(Double hashValue) {
@@ -1246,10 +1306,39 @@ public class MainActivity extends AppCompatActivity
             LatLng markerIndex = new LatLng(res.latitude, res.longitude);
             System.out.println(DoubleDuplicatesDetector.indexOf(markerIndex.latitude * -markerIndex.longitude));
 
-            currentIndex = DoubleDuplicatesDetector.indexOf(markerIndex.latitude * -markerIndex.longitude);
+            List<Double> newList = DoubleDuplicatesDetector;
+            int realIndex = closest(key,newList);
+            currentIndex = realIndex;
+
+            switch (ResolvedRoute){
+
+                case "Leralla_to_Johannesburg":
+
+                    previousStationValue.setText(LerallatoJHBLatLngAndStationName.get(markerIndex));
+                    nextStationValue.setText(LerallatoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex)+1)));
+
+                    break;
+
+                case "Pretoria_to_Johannesburg":
+
+                    previousStationValue.setText(PTAtoJHBLatLngAndStationName.get(markerIndex));
+                    nextStationValue.setText(PTAtoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex)+1)));
+
+                    break;
+
+                case "Johannesburg_to_Leralla":
+
+
+
+                    break;
+
+                default:
+                    Toast.makeText(this, "Stations Error!", Toast.LENGTH_SHORT).show();
+            }
 
         } else {
 
+            Toast.makeText(this, "Stations Error!", Toast.LENGTH_SHORT).show();
             if (low != null || high != null) {
                 res = low != null ? low.getValue() : high.getValue();
                 System.out.println("=============Closest Value==========");
@@ -1259,8 +1348,27 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    //finds the closest index value of the input within a give list
+    public int closest(Double of, List<Double> in) {
+        Double min = Double.MAX_VALUE;
+        Double closest = of;
+
+        for (Double v : in) {
+            final Double diff = Math.abs(v - of);
+
+            if (diff < min) {
+                min = diff;
+                closest = v;
+            }
+        }
+
+        return DoubleDuplicatesDetector.indexOf(closest);
+    }
+
     public static void clearCachedData() {
 
+        LerallatoJHBLatLngAndStationName.clear();
+        PTAtoJHBLatLngAndStationName.clear();
         latlngPoints.clear();
         DoubleDuplicatesDetector.clear();
         GeoLinkedHashMap.clear();
@@ -1396,6 +1504,11 @@ public class MainActivity extends AppCompatActivity
             anim.setDuration(700);
             anim.start();
         }
+
+    }
+
+    public void prepareRouteAndStationNames() {
+
 
     }
 
