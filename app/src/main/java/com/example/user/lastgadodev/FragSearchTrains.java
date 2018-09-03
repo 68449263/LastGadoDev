@@ -461,6 +461,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
             itemHolder.mSpeed_tv.setText(Double.toString(train.getCurrent_Speed()) + " km/h");
             itemHolder.Travel_State_tv.setText(train.getTravel_State());
             itemHolder.Route_Info_tv.setText(String.format("to %s",train.getDestination()));
+            itemHolder.NextStation_tv.setText(train.getNextStation());
             itemHolder.BtnViewLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -468,13 +469,12 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
                     int position = sectionAdapter.getPositionInSection(itemHolder.getAdapterPosition());
                     GeoTrain selectedTrain = geoTrainsList.get(position);
                     //here we try to get the train index on the map
-                    for (int x = 0; x <((MainActivity) getActivity()).TrainMarkers.keySet().size(); x++) {
+                    List<String> trainIDsAsKeys = new ArrayList<>();
+                    trainIDsAsKeys.addAll(((MainActivity) getActivity()).TrainMarkers.keySet());
 
-                        if (((MainActivity) getActivity()).TrainMarkers.containsKey(selectedTrain.getTrain_id())) {
+                    for (int x = 0; x <trainIDsAsKeys.size(); x++) {
 
-                            position = x;
-
-                        }
+                        if (trainIDsAsKeys.get(x) == selectedTrain.getTrain_id()) { position = x; }
 
                     }
 
@@ -482,10 +482,8 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
                     if (position == 0){
                         position = 1;
                     }
-
                     //here we subtract 1, because array starts to count from 0
-                    GeoTrain TrainOnMap = geoTrainsList.get(position - 1);
-
+                    GeoTrain TrainOnMap = geoTrainsList.get(position);
 
                     ((MainActivity) getActivity()).prepareUIforAnimation(TrainOnMap,position,true);
                     dismiss();
@@ -535,6 +533,7 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         public final TextView mSpeed_tv;
         public final TextView Travel_State_tv;
         public final TextView Route_Info_tv;
+        public final TextView NextStation_tv;
         public final Button BtnMoreInfo;
         public final Button BtnViewLocation;
 
@@ -543,11 +542,12 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
 
             rootView = view;
             mTrain_id_tv = view.findViewById(R.id.train_id);
-            mSpeed_tv = view.findViewById(R.id.speed);
+            mSpeed_tv = view.findViewById(R.id.speed_tv);
             BtnMoreInfo = view.findViewById(R.id.starttracking);
             Travel_State_tv = view.findViewById(R.id.travel_state);
             Route_Info_tv = view.findViewById(R.id.route_info);
             BtnViewLocation = view.findViewById(R.id.btn_view_loc);
+            NextStation_tv = view.findViewById(R.id.LVnextStationValue);
         }
     }
 }

@@ -6,18 +6,25 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;;
@@ -82,6 +89,8 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import com.example.user.lastgadodev.NetworkChangeReceiver;
+
 public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, Runnable {
 
@@ -123,10 +132,10 @@ public class MainActivity extends AppCompatActivity
     public static String ResolvedRoute;
 
     //holds path LatLng and the Station in which it belongs too.
-    public static LinkedHashMap<LatLng,String> LerallatoJHBLatLngAndStationName = new LinkedHashMap<>();
-    public static LinkedHashMap<LatLng,String> PTAtoJHBLatLngAndStationName = new LinkedHashMap<>();
-    public LinkedHashMap<LatLng,String> JHBtoPTALatLngAndStationName = new LinkedHashMap<>();
-    public LinkedHashMap<LatLng,String> JHBtoLerallaLatLngAndStationName = new LinkedHashMap<>();
+    public static LinkedHashMap<LatLng, String> LerallatoJHBLatLngAndStationName = new LinkedHashMap<>();
+    public static LinkedHashMap<LatLng, String> PTAtoJHBLatLngAndStationName = new LinkedHashMap<>();
+    public LinkedHashMap<LatLng, String> JHBtoPTALatLngAndStationName = new LinkedHashMap<>();
+    public LinkedHashMap<LatLng, String> JHBtoLerallaLatLngAndStationName = new LinkedHashMap<>();
     //----------------------------------------------------------------------------------------
 
     //---- Butter knife binding
@@ -142,7 +151,7 @@ public class MainActivity extends AppCompatActivity
     //username floating label
     CardView userNameFloatingLabel;
 
-    //---- Floating action button, shows map properties dialog when clicked
+    //---- Floating action button, shows map properties pop up when clicked
     FloatingActionButton ShowMapPropertiesFAB;
 
 
@@ -154,7 +163,7 @@ public class MainActivity extends AppCompatActivity
     GeoQuery geoQuery;
 
     //Collection of Markers
-    public HashMap<String, Marker> TrainMarkers = new HashMap<>();
+    public LinkedHashMap<String, Marker> TrainMarkers = new LinkedHashMap<>();
     ArrayList<String> TrainIDs = new ArrayList<>();
     //holds all the geotrains objects from the firebase database
     ArrayList<GeoTrain> geoTrainsList = new ArrayList<>();
@@ -184,6 +193,8 @@ public class MainActivity extends AppCompatActivity
 
     public DatabaseReference reference;
 
+    private BroadcastReceiver mNetworkReceiver;
+    static TextView tv_check_connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +202,10 @@ public class MainActivity extends AppCompatActivity
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        tv_check_connection = findViewById(R.id.tv_check_connection);
+        mNetworkReceiver = new NetworkChangeReceiver();
+        registerNetworkBroadcastForNougat();
 
         activityStart = true; //allows new makers to be placed on the map
         TrainIDs.clear();
@@ -296,7 +311,7 @@ public class MainActivity extends AppCompatActivity
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         // Setup the FAB button
         initializeFAB();
-        //more marker info dialog
+        //more marker info bottomDialog
         geoRideDialog = new Dialog(this);
         geoMapProperties = new Dialog(this);
 
@@ -305,7 +320,6 @@ public class MainActivity extends AppCompatActivity
         BottomSheetDepartureValue = findViewById(R.id.BottomSheetdepatureTV);
         BottomSheetDestinationValue = findViewById(R.id.BottomSheetdestinationTV);
         BottomSheetTrainIdValue = findViewById(R.id.bottomSheetTrainId);
-
     }
 
 
@@ -478,24 +492,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onBackPressed() {
 
-        //TODO: handle back press events
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        //stop();Todo: handle on resume flag
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        //Todo: if TrackingMarker was animating continue where it left off
-    }
 
     // calls bottom sheet, only when the tracking marker is in motion, to show more info about the marker
     public void toggleBottomSheet() {
@@ -786,7 +783,7 @@ public class MainActivity extends AppCompatActivity
                     MarkerInfo = new FragMarkerInfo();
 
                     prepareUIforAnimation(clickedGeoTrain, x, false);
-                    
+
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("geoTrain", clickedGeoTrain);
                     MarkerInfo.setArguments(bundle);
@@ -1054,7 +1051,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-       return latlngPoints.get(currentIndex + 1);
+        return latlngPoints.get(currentIndex + 1);
     }
 
     public LatLng getBeginLatLng() {
@@ -1129,7 +1126,7 @@ public class MainActivity extends AppCompatActivity
                     upDateDuplicatesDetectorArray(latLng);
                     latlngPoints.add(latLng);
 
-                    LerallatoJHBLatLngAndStationName.put(latLng,stations_data.StationNames[StationIndex]);
+                    LerallatoJHBLatLngAndStationName.put(latLng, stations_data.StationNames[StationIndex]);
 
                     if (latLng.latitude == stations_data.Stations[StationIndex].latitude || latLng.longitude == stations_data.Stations[StationIndex].longitude) {
 
@@ -1159,7 +1156,7 @@ public class MainActivity extends AppCompatActivity
                     upDateDuplicatesDetectorArray(latLng);
                     latlngPoints.add(latLng);
 
-                    PTAtoJHBLatLngAndStationName.put(latLng,stations_data.StationNames[StationIndex2]);
+                    PTAtoJHBLatLngAndStationName.put(latLng, stations_data.StationNames[StationIndex2]);
 
                     if (latLng.longitude == stations_data.Stations[StationIndex2].longitude || latLng.latitude == stations_data.Stations[StationIndex2].latitude) {
 
@@ -1307,27 +1304,26 @@ public class MainActivity extends AppCompatActivity
             System.out.println(DoubleDuplicatesDetector.indexOf(markerIndex.latitude * -markerIndex.longitude));
 
             List<Double> newList = DoubleDuplicatesDetector;
-            int realIndex = closest(key,newList);
+            int realIndex = closest(key, newList);
             currentIndex = realIndex;
 
-            switch (ResolvedRoute){
+            switch (ResolvedRoute) {
 
                 case "Leralla_to_Johannesburg":
 
                     previousStationValue.setText(LerallatoJHBLatLngAndStationName.get(markerIndex));
-                    nextStationValue.setText(LerallatoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex)+1)));
+                    nextStationValue.setText(LerallatoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex) + 1)));
 
                     break;
 
                 case "Pretoria_to_Johannesburg":
 
                     previousStationValue.setText(PTAtoJHBLatLngAndStationName.get(markerIndex));
-                    nextStationValue.setText(PTAtoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex)+1)));
+                    nextStationValue.setText(PTAtoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex) + 1)));
 
                     break;
 
                 case "Johannesburg_to_Leralla":
-
 
 
                     break;
@@ -1507,11 +1503,72 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void prepareRouteAndStationNames() {
+    //network indicator
+    public static void NetworkStateIndicator(boolean value, String message){
 
+        if(value){
+            tv_check_connection.setText(message);
+            tv_check_connection.setBackgroundColor(Color.GREEN);
+            tv_check_connection.setTextColor(Color.WHITE);
+
+            Handler handler = new Handler();
+            Runnable delayrunnable = new Runnable() {
+                @Override
+                public void run() {
+                    tv_check_connection.setVisibility(View.GONE);
+                }
+            };
+            handler.postDelayed(delayrunnable, 3000);
+        }else {
+            tv_check_connection.setVisibility(View.VISIBLE);
+            tv_check_connection.setText(message);
+            tv_check_connection.setBackgroundColor(Color.RED);
+            tv_check_connection.setTextColor(Color.WHITE);
+        }
+    }
+
+    private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
+
+    protected void unregisterNetworkChanges() {
+        try {
+            unregisterReceiver(mNetworkReceiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        //TODO: handle back press events
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //stop();Todo: handle on resume flag
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        //Todo: if TrackingMarker was animating continue where it left off
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterNetworkChanges();
+        mHandler.removeCallbacks(this);
+    }
 }
 
 //Todo : add stations to array list with respect to their route and keep iterating through them when the initially implemented

@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorDarkgray"
@@ -261,6 +262,19 @@
             android:text="Start"
             android:textColor="#fff"
             android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tv_check_connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/colorPrimary"
+            android:text="Network Status"
+            android:visibility="gone"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/navigation"

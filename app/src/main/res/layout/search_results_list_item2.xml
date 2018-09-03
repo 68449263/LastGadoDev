@@ -65,19 +65,17 @@
                         android:layout_marginTop="10dp"
                         android:layout_gravity="bottom"
                         android:gravity="bottom"
-                        android:orientation="horizontal"
-                        android:weightSum="3">
+                        android:orientation="vertical">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="2"
-                            android:orientation="vertical">
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start"
+                                android:layout_gravity="center_vertical"
                                 android:padding="5dp"
                                 android:text="Next Station"
                                 android:textColor="#f9f9f9"
@@ -87,7 +85,7 @@
                                 android:id="@+id/LVnextStationValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start"
+                                android:layout_gravity="center"
                                 android:padding="5dp"
                                 android:text="Next Station Value"
                                 android:textColor="#f9f9f9"
@@ -99,43 +97,14 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="0.5"
-                            android:orientation="vertical">
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start"
+                                android:layout_gravity="center"
                                 android:padding="5dp"
-                                android:text="Speed"
-                                android:textColor="#f9f9f9"
-                                android:textSize="10sp"/>
-
-                            <TextView
-                                android:id="@+id/speed"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start"
-                                android:padding="5dp"
-                                android:text="Train speed"
-                                android:textColor="#f9f9f9"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="0.5"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start"
-                                android:padding="5dp"
-                                android:text="13 min"
+                                android:text="State"
                                 android:textColor="#f9f9f9"
                                 android:textSize="10sp" />
 
@@ -144,7 +113,27 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
                                 android:padding="5dp"
-                                android:text="Delayed"
+                                android:text="Moving"
+                                android:textColor="#f9f9f9"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:padding="5dp"
+                                android:text="speed"
+                                android:textColor="#f9f9f9"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/speed_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:padding="5dp"
+                                android:text="train speed"
                                 android:textColor="#f9f9f9"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
