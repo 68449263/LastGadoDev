@@ -1254,6 +1254,12 @@ public class MainActivity extends AppCompatActivity
 
                 break;
 
+            case "Johannesburg_to_Pretoria":
+
+                Applicable_RouteLatLng = routeLatLngData.JohannesburgPretoriaLatLng();
+
+                break;
+
             default:
                 Toast.makeText(this, "Database Error!", Toast.LENGTH_SHORT).show();
 
