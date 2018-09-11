@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +29,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -46,6 +49,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.lastgadodev.Models.GeoTrain;
+import com.example.user.lastgadodev.adapters.SearchHistoryListAdapter;
+import com.example.user.lastgadodev.adapters.StationScheduleAdapter;
 import com.example.user.lastgadodev.data.RouteLatLngData;
 import com.example.user.lastgadodev.data.StationsData;
 import com.firebase.geofire.GeoFire;
@@ -74,6 +79,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -83,6 +89,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 // Butter knife
@@ -92,12 +100,13 @@ import butterknife.ButterKnife;
 import com.example.user.lastgadodev.NetworkChangeReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, Runnable {
+        implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, Runnable,StationScheduleAdapter.OnTouchListener {
 
     public GoogleMap geoMap;
     public Button StartTrainSearchFragmentButton;
     private Button ToggleBottomSheetState;
     public Button ButtonCancelTracking;
+    public Button ButtonScheduleNotification;
     public static StationsData stations_data = new StationsData();
     public static RouteLatLngData routeLatLngData = new RouteLatLngData();
 
@@ -131,11 +140,6 @@ public class MainActivity extends AppCompatActivity
     public static Set<Double> GeoHashValueSet = new HashSet<>();
     public static String ResolvedRoute;
 
-    //holds path LatLng and the Station in which it belongs too.
-    public static LinkedHashMap<LatLng, String> LerallatoJHBLatLngAndStationName = new LinkedHashMap<>();
-    public static LinkedHashMap<LatLng, String> PTAtoJHBLatLngAndStationName = new LinkedHashMap<>();
-    public LinkedHashMap<LatLng, String> JHBtoPTALatLngAndStationName = new LinkedHashMap<>();
-    public LinkedHashMap<LatLng, String> JHBtoLerallaLatLngAndStationName = new LinkedHashMap<>();
     //----------------------------------------------------------------------------------------
 
     //---- Butter knife binding
@@ -194,7 +198,15 @@ public class MainActivity extends AppCompatActivity
     public DatabaseReference reference;
 
     private BroadcastReceiver mNetworkReceiver;
-    static TextView tv_check_connection;
+    private static TextView tv_check_connection;
+
+    //used to schedule station delays
+    private ScheduledExecutorService stationDelay;
+    private boolean isStationReached = false;
+
+    //station notification schedule
+    public RecyclerView GeoStationSchedule;
+    public StationScheduleAdapter scheduleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,20 +215,17 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        tv_check_connection = findViewById(R.id.tv_check_connection);
-        mNetworkReceiver = new NetworkChangeReceiver();
-        registerNetworkBroadcastForNougat();
-
         activityStart = true; //allows new makers to be placed on the map
         TrainIDs.clear();
         geoTrainsList.clear();
         clearCachedData();
 
-        /* Get the SupportMapFragment and request notification
-           when the map is ready to be used. */
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        SupportMapFragment();
+        FireBaseSetup();
+        AdditionalSetup(); //sets up buttons, fragments etc, and their event listeners
+    }
+
+    private void FireBaseSetup() {
 
         //firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -244,7 +253,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        AdditionalSetup(); //sets up buttons, fragments etc, and their event listeners
+    }
+
+    private void SupportMapFragment() {
+
+        /* Get the SupportMapFragment and request notification
+           when the map is ready to be used. */
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     private void AdditionalSetup() {
@@ -283,7 +300,8 @@ public class MainActivity extends AppCompatActivity
         ButtonCancelTracking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stop();
+
+                stop(false);
 
             }
         });
@@ -320,8 +338,35 @@ public class MainActivity extends AppCompatActivity
         BottomSheetDepartureValue = findViewById(R.id.BottomSheetdepatureTV);
         BottomSheetDestinationValue = findViewById(R.id.BottomSheetdestinationTV);
         BottomSheetTrainIdValue = findViewById(R.id.bottomSheetTrainId);
-    }
 
+        tv_check_connection = findViewById(R.id.tv_check_connection);
+        mNetworkReceiver = new NetworkChangeReceiver();
+        registerNetworkBroadcastForNougat();
+
+        stationDelay = Executors.newSingleThreadScheduledExecutor();//Todo: clear this if it didn't workout
+
+        //schedule station reached notification
+        GeoStationSchedule = findViewById(R.id.RV_Schedule);
+        scheduleAdapter = new StationScheduleAdapter();
+        scheduleAdapter.setItemsOnClickListener(this);
+        GeoStationSchedule.setAdapter(scheduleAdapter);
+        GeoStationSchedule.setHasFixedSize(true);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        GeoStationSchedule.setLayoutManager(layoutManager);
+        GeoStationSchedule.setVisibility(View.GONE);
+
+        ButtonScheduleNotification = findViewById(R.id.scheduleButton);
+        ButtonScheduleNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                GeoStationSchedule.setVisibility(View.VISIBLE);
+                prepareStationsToBeScheduled();
+            }
+        });
+
+    }
 
     //Bottom navigation
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -493,7 +538,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
     // calls bottom sheet, only when the tracking marker is in motion, to show more info about the marker
     public void toggleBottomSheet() {
         if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
@@ -553,6 +597,11 @@ public class MainActivity extends AppCompatActivity
                 return v;
             }
         });
+
+    }
+
+    @Override
+    public void onMapLoaded() {
 
     }
 
@@ -645,6 +694,7 @@ public class MainActivity extends AppCompatActivity
 
                     //prevents the app from reloading all markers (we only want to update markers that changed position)
                     activityStart = false;
+                    //dismisses the progress dialog
 
                 } else {
                     //Since markers are already added, we just update their location and info
@@ -852,6 +902,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startAnimation(boolean showPolyLineToDestination) {
+
         if (latlngPoints.size() > 2) {
             initialize(showPolyLineToDestination);
             //Todo:don't forget to change the state to false, on destination reached or animation stopped
@@ -937,6 +988,7 @@ public class MainActivity extends AppCompatActivity
         LatLng newPosition = new LatLng(lat, lng);
         Log.w("newPosition", newPosition + "");
 
+
         TrackingGeoCircle.setCenter(newPosition);
         TrackingGeoMarker.setPosition(newPosition);
 
@@ -981,11 +1033,23 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void trainReachedStation(int delayTime) {
+
+        stationDelay.schedule(this, delayTime, TimeUnit.SECONDS);
+
+    }
+
+    private void timeToLeaveCurrentStation() {
+
+         startAnimation(true);
+    }
+
     /*
      * returns current route for tracking marker
      * this method is only called when the train reaches dead end station or trains terminal*/
     private String getLatestRouteForCurrentTrain() {
 
+        //todo: query the database directly to get the accurate data
         String route = clickedGeoTrain.getRoute_Info();
         return route;
     }
@@ -1039,15 +1103,16 @@ public class MainActivity extends AppCompatActivity
 
             if (latlngPoints.get(currentIndex).latitude == stations_data.Stations[x].latitude || latlngPoints.get(currentIndex).longitude == stations_data.Stations[x].longitude) {
 
+                isStationReached = true;
                 //updates the floating cardView of previous next station labels
                 UpdatePrevNxtStationValues(endLatLng, beginLatLng, x);
 
                 try {
                     TimeUnit.SECONDS.sleep(3);
-                    //    TimeUnit.MINUTES.sleep(1);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
+
             }
         }
 
@@ -1059,19 +1124,26 @@ public class MainActivity extends AppCompatActivity
         return latlngPoints.get(currentIndex);
     }
 
-    public void stop() {
+    public void stop(boolean isStationDelay) {
 
-        mHandler.removeCallbacks(this);
-        TrackingMarkerIsAnimating = false;
+        if (isStationDelay){
 
-        //TODO: review this functionality efficiency
-        StartTrainSearchFragmentButton.setVisibility(View.VISIBLE);
-        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        latlngPoints.clear();
-        //Todo : check is stop() was called due to station delay or not, if true update the index to + 1
-        //Todo: write a function to continue animation instead of using startAnimation on station delays
-        currentIndex = 0;  //Todo: if animating a moving train already, set the current index to its current latlng
+            mHandler.removeCallbacks(this);
 
+        }else {
+
+            mHandler.removeCallbacks(this);
+            TrackingMarkerIsAnimating = false;
+
+            //TODO: review this functionality efficiency
+            StartTrainSearchFragmentButton.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            latlngPoints.clear();
+            //Todo : check is stop() was called due to station delay or not, if true update the index to + 1
+            //Todo: write a function to continue animation instead of using startAnimation on station delays
+            currentIndex = 0;  //Todo: if animating a moving train already, set the current index to its current latlng
+
+        }
     }
 
     public void reset() {
@@ -1115,7 +1187,6 @@ public class MainActivity extends AppCompatActivity
 
             case "Leralla_to_Johannesburg":
 
-                int StationIndex = 9;
                 ResolvedRoute = "Leralla_to_Johannesburg";
                 clearCachedData();
                 possibleRoute = routeLatLngData.LerallaJohannesburgLatLng;
@@ -1126,19 +1197,7 @@ public class MainActivity extends AppCompatActivity
                     upDateDuplicatesDetectorArray(latLng);
                     latlngPoints.add(latLng);
 
-                    LerallatoJHBLatLngAndStationName.put(latLng, stations_data.StationNames[StationIndex]);
-
-                    if (latLng.latitude == stations_data.Stations[StationIndex].latitude || latLng.longitude == stations_data.Stations[StationIndex].longitude) {
-
-                        StationIndex++;//moves to next station
-
-                    }
-
                 }
-
-                System.out.println("===========Station Data Leralla To JHB=========");
-                System.out.println(LerallatoJHBLatLngAndStationName);
-                System.out.println("===============================================");
 
                 upDateLinkedHashMap();
 
@@ -1146,7 +1205,6 @@ public class MainActivity extends AppCompatActivity
 
             case "Pretoria_to_Johannesburg":
 
-                int StationIndex2 = 0;
                 ResolvedRoute = "Pretoria_to_Johannesburg";
                 clearCachedData();
                 possibleRoute = routeLatLngData.PretoriaJohannesburgLatLng;
@@ -1156,19 +1214,7 @@ public class MainActivity extends AppCompatActivity
                     upDateDuplicatesDetectorArray(latLng);
                     latlngPoints.add(latLng);
 
-                    PTAtoJHBLatLngAndStationName.put(latLng, stations_data.StationNames[StationIndex2]);
-
-                    if (latLng.longitude == stations_data.Stations[StationIndex2].longitude || latLng.latitude == stations_data.Stations[StationIndex2].latitude) {
-
-                        StationIndex2++;//moves to next station
-
-                    }
-
                 }
-
-                System.out.println("===========Station Data Pretoria To JHB=========");
-                System.out.println(PTAtoJHBLatLngAndStationName);
-                System.out.println("================================================");
 
                 upDateLinkedHashMap();
 
@@ -1313,19 +1359,22 @@ public class MainActivity extends AppCompatActivity
             int realIndex = closest(key, newList);
             currentIndex = realIndex;
 
+            Double possibleNearestStationHashValue = latlngPoints.get(currentIndex).latitude * -latlngPoints.get(currentIndex).longitude;
+            int stationIndex = stations_data.resolveStationIndex(possibleNearestStationHashValue);
+
             switch (ResolvedRoute) {
 
                 case "Leralla_to_Johannesburg":
 
-                    previousStationValue.setText(LerallatoJHBLatLngAndStationName.get(markerIndex));
-                    nextStationValue.setText(LerallatoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex) + 1)));
+                    previousStationValue.setText(stations_data.StationNames[stationIndex]);
+                    nextStationValue.setText(stations_data.StationNames[stationIndex + 1]);
 
                     break;
 
                 case "Pretoria_to_Johannesburg":
 
-                    previousStationValue.setText(PTAtoJHBLatLngAndStationName.get(markerIndex));
-                    nextStationValue.setText(PTAtoJHBLatLngAndStationName.get(latlngPoints.get(latlngPoints.indexOf(markerIndex) + 1)));
+                    previousStationValue.setText(stations_data.StationNames[stationIndex]);
+                    nextStationValue.setText(stations_data.StationNames[stationIndex + 1]);
 
                     break;
 
@@ -1369,8 +1418,6 @@ public class MainActivity extends AppCompatActivity
 
     public static void clearCachedData() {
 
-        LerallatoJHBLatLngAndStationName.clear();
-        PTAtoJHBLatLngAndStationName.clear();
         latlngPoints.clear();
         DoubleDuplicatesDetector.clear();
         GeoLinkedHashMap.clear();
@@ -1510,11 +1557,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     //network indicator
-    public static void NetworkStateIndicator(boolean value, String message){
+    public static void NetworkStateIndicator(boolean value, String message) {
 
-        if(value){
+        if (value) {
             tv_check_connection.setText(message);
-            tv_check_connection.setBackgroundColor(Color.GREEN);
+            tv_check_connection.setBackgroundColor(Color.rgb(0, 153, 51));
             tv_check_connection.setTextColor(Color.WHITE);
 
             Handler handler = new Handler();
@@ -1525,10 +1572,10 @@ public class MainActivity extends AppCompatActivity
                 }
             };
             handler.postDelayed(delayrunnable, 3000);
-        }else {
+        } else {
             tv_check_connection.setVisibility(View.VISIBLE);
             tv_check_connection.setText(message);
-            tv_check_connection.setBackgroundColor(Color.RED);
+            tv_check_connection.setBackgroundColor(Color.rgb(204, 0, 0));
             tv_check_connection.setTextColor(Color.WHITE);
         }
     }
@@ -1550,6 +1597,38 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void progressDialog(String message, boolean shouldShow) {
+
+        ProgressDialog pd = new ProgressDialog(this);
+        // Set progress dialog style spinner
+        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        // Set the progress dialog title and message
+        pd.setTitle("Geometrorail");
+        pd.setMessage(String.format("%s.....", message));
+        // Set the progress dialog background color
+        pd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFD4D9D0")));
+
+        Window w = pd.getWindow();
+        w.setGravity(Gravity.CENTER);
+
+        pd.setIndeterminate(false);
+        pd.show();
+    }
+
+    private void prepareStationsToBeScheduled() {
+
+        List<String> stationsNamesList = new ArrayList<>(stations_data.Leralla_to_Johannesburg.keySet());
+        List<LatLng> stationsLatLngList = new ArrayList<>(stations_data.Leralla_to_Johannesburg.values());
+        scheduleAdapter.populateScheduleList(stationsNamesList);
+    }
+
+    @Override
+    public void onAddStationNotification(View view, int pos) {
+
+
+
+    }
+
     @Override
     public void onBackPressed() {
 
@@ -1560,7 +1639,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        //stop();Todo: handle on resume flag
+      //  stop(false); //Todo: handle on resume flag
     }
 
     @Override
@@ -1575,11 +1654,9 @@ public class MainActivity extends AppCompatActivity
         unregisterNetworkChanges();
         mHandler.removeCallbacks(this);
     }
+
 }
 
-//Todo : add stations to array list with respect to their route and keep iterating through them when the initially implemented
-//Todo .... conditions are true. eg if the station is found after for loop iteration, we increase or decrease the station index
-//Todo .... this could possibly solve the initial station issue and open more flexible functionality
 //Todo: use this function to resume animation after station delay
 /*
 public void scheduleTimeToLeave() {

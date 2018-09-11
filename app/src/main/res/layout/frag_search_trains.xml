@@ -62,7 +62,10 @@
                                     style="@style/searchtextinput"
                                     android:layout_weight="2"
                                     android:hint="Your Station"
-                                    android:theme="@style/EditTextTheme" />
+                                    android:theme="@style/EditTextTheme"
+                                    android:maxLines="1"
+                                    android:imeOptions="actionNext"
+                                    android:singleLine="true"/>
 
                                 <ImageButton
                                     android:id="@+id/ButtonDeparturePopUp"
@@ -96,6 +99,7 @@
                                     style="@style/searchtextinput"
                                     android:layout_weight="2"
                                     android:hint="Destination"
+                                    android:imeOptions="actionSearch"
                                     android:theme="@style/EditTextTheme" />
 
                                 <ImageButton
@@ -170,7 +174,7 @@
 
             </RelativeLayout>
 
-            <Button
+            <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
                 android:stateListAnimator="@drawable/gradientbackground"
                 android:elevation="0dp"
                 android:id="@+id/search_trains"
@@ -179,9 +183,13 @@
                 android:layout_margin="35dp"
                 android:background="@drawable/button_background"
                 android:textSize="18sp"
+                android:layout_gravity="center"
                 android:textAllCaps="false"
                 android:text="Search"
-                android:textColor="#fff" />
+                android:textColor="#fff"
+                app:spinning_bar_color="@color/whiteColor"
+                app:spinning_bar_width="6dp"
+                app:spinning_bar_padding="6dp"/>
 
 
             <LinearLayout
@@ -204,7 +212,7 @@
                     android:textStyle="bold"
                     android:textSize="15sp"
                     android:textColor="#f9f9f9"
-                    android:text="View History" />
+                    android:text="View Supported Routes" />
 
                 <ImageButton
                     android:id="@+id/ShowSearchHistory"
@@ -213,7 +221,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|end"
                     android:layout_marginEnd="5dp"
-                    android:background="@drawable/ic_curretdown" />
+                    android:background="@drawable/ic_curretdown"/>
 
             </LinearLayout>
 

@@ -63,6 +63,9 @@ dependencies {
 
     //handles multiple permission
     implementation 'com.karumi:dexter:5.0.0'
+
+    //loading button
+    implementation 'br.com.simplepass:loading-button-android:1.7.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

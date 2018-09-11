@@ -7,9 +7,12 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -23,6 +26,7 @@ import com.example.user.lastgadodev.adapters.AutoCompleteTextInputAdapter;
 import com.example.user.lastgadodev.adapters.SearchHistoryListAdapter;
 import com.example.user.lastgadodev.adapters.SearchResultsListAdapter;
 import com.example.user.lastgadodev.data.StationsData;
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,11 +34,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class FragSearchTrains extends BottomSheetDialogFragment implements SearchResultsListAdapter.OnItemClickListener, SearchHistoryListAdapter.OnItemClickListener {
@@ -67,6 +75,9 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
     public List<GeoTrain> GeoTrains_Pretoria_to_Johannesburg = new ArrayList<>();
     public List<GeoTrain> GeoTrains_Pretoria_to_Germiston = new ArrayList<>();
     public List<GeoTrain> GeoTrains_Pretoria_to_Elandsfontein = new ArrayList<>();
+
+    //route history hash map
+    public LinkedHashMap<String, String> RouteHash = new LinkedHashMap<>();
 
     public StationsData stationsData = new StationsData();
 
@@ -130,10 +141,11 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
 
         initCustomAutoCompleteTextView(view);
 
-        Button button = view.findViewById(R.id.search_trains);
+        final CircularProgressButton button = view.findViewById(R.id.search_trains);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
 
                 if (DepartureACTV.getText().toString().equalsIgnoreCase("")||  DestinationACTV.getText().toString().equalsIgnoreCase("")){
 
@@ -142,26 +154,53 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
                             Toast.LENGTH_SHORT).show();
 
                 }else {
-
+                    button.startAnimation();
                     //clears the current route path that is stored
                     ((MainActivity) getActivity()).latlngPoints.clear();
                     //gets the possible route based on user inputs
                     FindPossibleRoute();
                 }
 
-
+                    button.stopAnimation();
 
             }
         });
 
-        DepartureACTV.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        DestinationACTV.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onFocusChange(View view, boolean b) {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    if (DepartureACTV.getText().toString().equalsIgnoreCase("")||  DestinationACTV.getText().toString().equalsIgnoreCase("")){
 
+                        Toast.makeText(getContext(),
+                                String.format("Insert all values."),
+                                Toast.LENGTH_SHORT).show();
+
+                    }else {
+                        button.startAnimation();
+                        //clears the current route path that is stored
+                        ((MainActivity) getActivity()).latlngPoints.clear();
+                        //gets the possible route based on user inputs
+                        FindPossibleRoute();
+                    }
+
+                    button.stopAnimation();
+                    hideSoftKeyBoard();
+                    return true;
+                }
+                return false;
             }
         });
 
         return view;
+    }
+
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+            imm.hideSoftInputFromWindow(DestinationACTV.getWindowToken(), 0);
+        }
     }
 
 
@@ -189,12 +228,15 @@ public class FragSearchTrains extends BottomSheetDialogFragment implements Searc
         SearchedPossibleRoutes.add("Pretoria_to_Germiston");
         SearchedPossibleRoutes.add("Pretoria_to_Elandsfontein");
 
+/*        RouteHash.put("Leralla to Johannesburg","Leralla_to_Johannesburg");
+        RouteHash.put("Pretoria to Johannesburg","Pretoria_to_Johannesburg");
+        SearchedPossibleRoutes = RouteHash.keySet();*/
+
 /*        SearchedPossibleRoutes.add("Leralla_to_Isando");
         SearchedPossibleRoutes.add("Leralla_to_KemptonPark");
         SearchedPossibleRoutes.add("Pretoria_to_Johannesburg");
         SearchedPossibleRoutes.add("Pretoria_to_Germiston");
         SearchedPossibleRoutes.add("Pretoria_to_Elandsfontein");*/
-
         searchHistoryListAdapter.populateSearchHistory(SearchedPossibleRoutes);
 
     }

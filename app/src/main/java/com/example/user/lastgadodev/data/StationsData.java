@@ -3,7 +3,10 @@ package com.example.user.lastgadodev.data;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.example.user.lastgadodev.MainActivity.clearCachedData;
 
@@ -12,6 +15,8 @@ import static com.example.user.lastgadodev.MainActivity.clearCachedData;
 public class StationsData {
 
     public String possibleRoute;
+    //holds stations hash values
+    public static ArrayList<Double> StationHashValues = new ArrayList<>();
 
     private LatLng Pretoria = new LatLng(-25.75954, 28.18902);
     private LatLng Fonteine = new LatLng(-25.78395,   28.1932);
@@ -299,6 +304,43 @@ public class StationsData {
         Pretoria_to_Germiston.clear();
         Pretoria_to_Elandsfontein.clear();
 
+    }
+
+    public List<Double> ListOfHashValueForStation (){
+
+        for(int x = 0; x < StationNames.length ; x ++){
+
+            Double StationHash = Stations[x].latitude * -Stations[x].longitude;
+            StationHashValues.add(StationHash);
+
+        }
+
+        return StationHashValues;
+    }
+
+
+    public int resolveStationIndex (Double hashValue){
+
+        ListOfHashValueForStation().clear();
+
+      return   nearestStationIndex(hashValue,ListOfHashValueForStation());
+
+    }
+
+    public int nearestStationIndex(Double currentPosition, List<Double> stationLongitudes) {
+        Double min = Double.MAX_VALUE;
+        Double closestStation = currentPosition;
+
+        for (Double v : stationLongitudes) {
+            final Double diff = Math.abs(v - currentPosition);
+
+            if (diff < min) {
+                min = diff;
+                closestStation = v;
+            }
+        }
+
+        return ListOfHashValueForStation().indexOf(closestStation);
     }
 
 }

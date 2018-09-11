@@ -52,6 +52,8 @@ import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.List;
 
+import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
+
 public class SplashScreen extends AppCompatActivity {
 
     private InterstitialAd interstitialAd;
@@ -63,7 +65,7 @@ public class SplashScreen extends AppCompatActivity {
     private LinearLayout dotsLayout;
     private TextView[] dots;
     private int[] layouts;
-    private Button btnSkip, btnNext;
+    private CircularProgressButton btnSkip, btnNext;
 
     private RelativeLayout introsliderLayout;
 
@@ -166,7 +168,6 @@ public class SplashScreen extends AppCompatActivity {
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         // check if all permissions are granted
                         if (report.areAllPermissionsGranted()) {
-                            Toast.makeText(getApplicationContext(), "All permissions are granted!", Toast.LENGTH_SHORT).show();
 
                             // Checking for first time launch - before calling setContentView()
                             if (!prefManager.isFirstTimeLaunch()) {
@@ -178,7 +179,8 @@ public class SplashScreen extends AppCompatActivity {
                             } else {
                                 prefManager.setFirstTimeLaunch(false);
                                 showIntroSlider();
-                            }
+
+                                }
 
                         }
 
@@ -307,6 +309,7 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //we don't show adverts on first launch
+                btnSkip.startAnimation();
                 Intent HomeActivity = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(HomeActivity);
             }
@@ -317,6 +320,7 @@ public class SplashScreen extends AppCompatActivity {
             public void onClick(View v) {
                 // checking for last page
                 // if last page main activity screen will be launched
+
                 int current = getItem(+1);
                 if (current < layouts.length) {
                     // move to next screen
@@ -324,6 +328,7 @@ public class SplashScreen extends AppCompatActivity {
                 } else {
                     //we have reached the end of slider items
                     //we don't show adverts on first launch
+                    btnNext.startAnimation();
                     Intent HomeActivity = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(HomeActivity);
                 }
