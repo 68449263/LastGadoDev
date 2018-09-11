@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity
     //station notification schedule
     public RecyclerView GeoStationSchedule;
     public StationScheduleAdapter scheduleAdapter;
+    CardView RouteDetailsBottomSheetCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,11 +357,14 @@ public class MainActivity extends AppCompatActivity
         GeoStationSchedule.setLayoutManager(layoutManager);
         GeoStationSchedule.setVisibility(View.GONE);
 
+        RouteDetailsBottomSheetCard = findViewById(R.id.RouteDetailsBottomSheetCard);
+
         ButtonScheduleNotification = findViewById(R.id.scheduleButton);
         ButtonScheduleNotification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                RouteDetailsBottomSheetCard.setVisibility(View.GONE);
                 GeoStationSchedule.setVisibility(View.VISIBLE);
                 prepareStationsToBeScheduled();
             }
@@ -515,6 +519,8 @@ public class MainActivity extends AppCompatActivity
                     break;
                     case BottomSheetBehavior.STATE_COLLAPSED: {
                         ToggleBottomSheetState.setBackgroundResource(R.drawable.ic_plus);
+                        RouteDetailsBottomSheetCard.setVisibility(View.VISIBLE);
+                        GeoStationSchedule.setVisibility(View.GONE);
                         if (TrackingMarkerIsAnimating) {
 
                             userNameFloatingLabel.setVisibility(View.GONE);
