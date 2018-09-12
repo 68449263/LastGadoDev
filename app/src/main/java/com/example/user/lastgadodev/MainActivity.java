@@ -8,24 +8,23 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;;
@@ -49,7 +48,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.lastgadodev.Models.GeoTrain;
-import com.example.user.lastgadodev.adapters.SearchHistoryListAdapter;
 import com.example.user.lastgadodev.adapters.StationScheduleAdapter;
 import com.example.user.lastgadodev.data.RouteLatLngData;
 import com.example.user.lastgadodev.data.StationsData;
@@ -79,8 +77,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -97,10 +93,8 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import com.example.user.lastgadodev.NetworkChangeReceiver;
-
 public class MainActivity extends AppCompatActivity
-        implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, Runnable,StationScheduleAdapter.OnTouchListener {
+        implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, Runnable, StationScheduleAdapter.OnTouchListener {
 
     public GoogleMap geoMap;
     public Button StartTrainSearchFragmentButton;
@@ -174,6 +168,7 @@ public class MainActivity extends AppCompatActivity
 
     private boolean mapReady = false;
     boolean activityStart;
+    static boolean isAppAlive;
 
     //possible route
     public String possibleRoute;
@@ -208,6 +203,7 @@ public class MainActivity extends AppCompatActivity
     public RecyclerView GeoStationSchedule;
     public StationScheduleAdapter scheduleAdapter;
     CardView RouteDetailsBottomSheetCard;
+    CardView stopTrackingCardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,6 +213,7 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         activityStart = true; //allows new makers to be placed on the map
+        isAppAlive = true; //currently  used to manage broadcast receiver UI updates
         TrainIDs.clear();
         geoTrainsList.clear();
         clearCachedData();
@@ -358,6 +355,7 @@ public class MainActivity extends AppCompatActivity
         GeoStationSchedule.setVisibility(View.GONE);
 
         RouteDetailsBottomSheetCard = findViewById(R.id.RouteDetailsBottomSheetCard);
+        stopTrackingCardView = findViewById(R.id.stopTrackingCardView);
 
         ButtonScheduleNotification = findViewById(R.id.scheduleButton);
         ButtonScheduleNotification.setOnClickListener(new View.OnClickListener() {
@@ -499,6 +497,8 @@ public class MainActivity extends AppCompatActivity
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN: {
 
+                        stopTrackingCardView.setVisibility(View.GONE);
+                        navigation.setVisibility(View.VISIBLE);
                         prevNxtStation.setVisibility(View.GONE);
                         userNameFloatingLabel.setVisibility(View.VISIBLE);
                         //this condition ensures the visibility of bottom sheet when the marker is animating
@@ -513,11 +513,16 @@ public class MainActivity extends AppCompatActivity
                     break;
                     case BottomSheetBehavior.STATE_EXPANDED: {
 
+                        navigation.setVisibility(View.GONE);
+                        stopTrackingCardView.setVisibility(View.VISIBLE);
                         ToggleBottomSheetState.setBackgroundResource(R.drawable.ic_close);
 
                     }
                     break;
                     case BottomSheetBehavior.STATE_COLLAPSED: {
+
+                        navigation.setVisibility(View.GONE);
+                        stopTrackingCardView.setVisibility(View.VISIBLE);
                         ToggleBottomSheetState.setBackgroundResource(R.drawable.ic_plus);
                         RouteDetailsBottomSheetCard.setVisibility(View.VISIBLE);
                         GeoStationSchedule.setVisibility(View.GONE);
@@ -1047,7 +1052,7 @@ public class MainActivity extends AppCompatActivity
 
     private void timeToLeaveCurrentStation() {
 
-         startAnimation(true);
+        startAnimation(true);
     }
 
     /*
@@ -1109,14 +1114,20 @@ public class MainActivity extends AppCompatActivity
 
             if (latlngPoints.get(currentIndex).latitude == stations_data.Stations[x].latitude || latlngPoints.get(currentIndex).longitude == stations_data.Stations[x].longitude) {
 
-                isStationReached = true;
                 //updates the floating cardView of previous next station labels
                 UpdatePrevNxtStationValues(endLatLng, beginLatLng, x);
 
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                isStationReached = true;
+                long StartTrainDelay = System.currentTimeMillis();
+                long ExpectedTrainDelay = StartTrainDelay + 3000;
+
+                while (StartTrainDelay  < ExpectedTrainDelay) {
+
+                    StartTrainDelay = System.currentTimeMillis();
+                    //todo: display an advert if advert flag is true, trynot to display advert on every station
+                    //todo: add a count down to when train will leave the station / give feedback why UI is frozen
+                    //todo: find out how uber pase its animation without affecting the ui thread
+
                 }
 
             }
@@ -1132,11 +1143,11 @@ public class MainActivity extends AppCompatActivity
 
     public void stop(boolean isStationDelay) {
 
-        if (isStationDelay){
+        if (isStationDelay) {
 
             mHandler.removeCallbacks(this);
 
-        }else {
+        } else {
 
             mHandler.removeCallbacks(this);
             TrackingMarkerIsAnimating = false;
@@ -1565,7 +1576,8 @@ public class MainActivity extends AppCompatActivity
     //network indicator
     public static void NetworkStateIndicator(boolean value, String message) {
 
-        if (value) {
+        if (value && isAppAlive) {
+
             tv_check_connection.setText(message);
             tv_check_connection.setBackgroundColor(Color.rgb(0, 153, 51));
             tv_check_connection.setTextColor(Color.WHITE);
@@ -1578,11 +1590,15 @@ public class MainActivity extends AppCompatActivity
                 }
             };
             handler.postDelayed(delayrunnable, 3000);
+
         } else {
+
+            if (!isAppAlive) return;
             tv_check_connection.setVisibility(View.VISIBLE);
             tv_check_connection.setText(message);
             tv_check_connection.setBackgroundColor(Color.rgb(204, 0, 0));
             tv_check_connection.setTextColor(Color.WHITE);
+
         }
     }
 
@@ -1597,7 +1613,14 @@ public class MainActivity extends AppCompatActivity
 
     protected void unregisterNetworkChanges() {
         try {
+
+            mNetworkReceiver.abortBroadcast();
             unregisterReceiver(mNetworkReceiver);
+            PackageManager pm = this.getPackageManager();
+            ComponentName componentName = new ComponentName(this, NetworkChangeReceiver.class);
+            pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -1632,7 +1655,6 @@ public class MainActivity extends AppCompatActivity
     public void onAddStationNotification(View view, int pos) {
 
 
-
     }
 
     @Override
@@ -1645,7 +1667,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-      //  stop(false); //Todo: handle on resume flag
+        //  stop(false); //Todo: handle on resume flag
+        activityStart = false;
+        isAppAlive = false;
+        unregisterNetworkChanges();
     }
 
     @Override
@@ -1657,8 +1682,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        activityStart = false;
+        isAppAlive = false;
         unregisterNetworkChanges();
         mHandler.removeCallbacks(this);
+        unregisterComponentCallbacks(this);
     }
 
 }

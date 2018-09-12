@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -33,26 +32,45 @@
                     android:orientation="horizontal"
                     android:padding="5dp">
 
-                        <ImageView
-                            android:layout_width="26dp"
-                            android:layout_height="61dp"
-                            android:layout_gravity="center_horizontal"
-                            android:src="@drawable/white_material_marker" />
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="61dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/white_material_marker" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/station_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:gravity="center"
                             android:layout_marginStart="5dp"
                             android:ellipsize="end"
+                            android:gravity="center"
                             android:maxLines="1"
                             android:text="Station Name"
                             android:textColor="#f9f9f9"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="5dp"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:text="station"
+                            android:textColor="#f9f9f9"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
 
 
                 </LinearLayout>
@@ -66,25 +84,25 @@
             android:clickable="true"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardCornerRadius="3dp"
-            app:cardPreventCornerOverlap="true"
-            app:cardElevation="0dp">
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
                 android:layout_gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="10dp">
 
                 <Switch
                     android:id="@+id/scheduleNotificationSW"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:text="Receive Notification "
                     android:textColor="#ffbb00"
                     android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:text="Receive Notification " />
+                    android:textStyle="bold" />
 
             </LinearLayout>
 

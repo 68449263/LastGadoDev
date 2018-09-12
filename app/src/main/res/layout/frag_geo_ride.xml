@@ -3,9 +3,9 @@
     android:layout_width="350dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
-    android:background="#f9f9f9"
+    android:background="#f5f5ef"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="15dp">
 
     <TextView
         android:id="@+id/txtclose"
@@ -27,17 +27,16 @@
             android:layout_width="36dp"
             android:layout_height="46dp"
             android:layout_gravity="center"
-            android:layout_marginTop="15dp"
-            android:src="@drawable/geometroappicon" />
+            android:src="@drawable/ic_local_taxi_black_24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
-            android:text="Single Adult"
+            android:text="Geo Local Taxi"
             android:textSize="20dp"
-            android:textColor="#1c2224"
+            android:textColor="#ffbb00"
             android:textStyle="bold" />
 
         <TextView
@@ -45,8 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
-            android:text="Leralla to Johannesburg"
-            android:textColor="#1c2224" />
+            android:text="coming soon!"
+            android:textColor="#ffbb00" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,44 +58,20 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
-                android:text="Exp : "
-                android:textColor="#1c2224" />
+                android:text="more info @ : "
+                android:textColor="#ffaa00" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
-                android:text="12-December-2018"
-                android:textColor="#1c2224" />
+                android:text=" www.geometrorail.co.za"
+                android:textColor="#ffaa00" />
 
         </LinearLayout>
 
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_qr_code" />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/btnfollow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
-        android:background="@color/colorPrimary"
-        android:text="Verify"
-        android:textColor="#fff" />
 
 </LinearLayout>
